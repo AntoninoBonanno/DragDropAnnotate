@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="./index.css" type="text/css" />
+  <link rel="stylesheet" href="./vendor/fontawesome-free-5.12.1-web/css/all.min.css" type="text/css" />
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" crossorigin="anonymous"></script>
+
+  <link rel="stylesheet" href="../src/dragDropAnnotate.min.css" type="text/css" />
+  <script src="../src/dragDropAnnotate.min.js"></script>
+
+  <script>
+    var anno;
+
+    $(document).ready(function () {
+
+      anno = $("#imageExample").annotable({
+        draggable: ".annotation"
+      });
+
+      $(".annotation").mouseover(function () {
+        anno.highlightAnnotation($(this).attr("annotation-id"));
+      });
+
+      anno.on('onMouseMoveOverItem', function (event, coordinate) {
+        $('#showPixel').html("[x: " + coordinate.x + " - y: " + coordinate.y + "]");
+      });
+
+      anno.on('onAnnotationCreated', function (event, annotation) {
+        console.log(annotation);
+      });
+
+      anno.on('onAnnotationUpdated', function (event, annotation) {
+        console.log(annotation);
+      });
+
+      anno.on('onAnnotationRemoved', function (event, annotation) {
+        console.log(annotation);
+      });
+
+      var myAnnotation = {
+        id: 3,
+        text: "customAnnotation",
+        position: {
+          center: { x: 593, y: 353 }
+        },
+        width: 250,
+        height: 400
+      };
+      anno.addAnnotation(myAnnotation);
+
+      var annos = $(".annotableImage").annotable({ //return array of annotable
+        draggable: ".annotation",
+        annotationStyle: { //annotation style 
+          hiBorderColor: 'red', // border color for highlighted annotation  
+          hiBorderSize: 3.2,  //border width for highlighted annotation  [1-12]    
+          imageBorder: false, //if false, not show the border on annotation 
+        }
+      });
+
+      $(".annotableImage").on('onAnnotationCreated', function (event, annotation) {
+        console.log(annotation);
+      });
+    });
+
+  </script>
+</head>
+
+<body>
+
+  <div class="sidenav">
+    <h3>Annotations</h3>
+    <h5><i class="fas fa-feather-alt"></i> Drag and Drop an annotation to Annotate</h5>
+    <div class="annotation" annotation-text="Dog" annotation-width="200" annotation-height="400" annotation-id="1">1 -
+      Dog
+    </div>
+    <div class="annotation" annotation-text="Cat" annotation-width="600" annotation-height="500" annotation-id="2">2 -
+      Cat
+    </div>
+
+    <h3>Image Annotations</h3>
+    <img class="annotation" src="./imageAnnotations/Dalmatiner.jpg" annotation-text="Dog" style="height:100px" />
+    <img class="annotation" src="./imageAnnotations/BluEye.jpg" annotation-text="Blue eye" style="height:100px" />
+    <img class="annotation" src="./imageAnnotations/YellowEye.jpg" annotation-text="Yellow eye" style="height:100px" />
+  </div>
+
+
+  <div class="main">
+    <h1>Annotation Test Page</h1>
+
+    <h2>Test Images</h2>
+    <div>
+      <button onclick="anno.removeAll('1')">Remove Id 1</button>
+      <button onclick="anno.removeAll()">Remove all annotations</button>
+      <button onclick="anno.hideAnnotations()">Hide annotations</button>
+      <button onclick="anno.showAnnotations()">Show annotations</button>
+
+      <div style="margin-top: 50px;" id="showPixel">[x: 0 - y: 0]</div>
+      <img id="imageExample" src="784px-Dalmatiner_schw_braun.jpg" width="505">
+      <p class="image-caption">
+        Die verschiedenen Farben eines Dalmatiners Public Domain. Source:
+        <a href="https://commons.wikimedia.org/wiki/File:Dalmatiner_schw_braun.jpg">Wikimedia
+          Commons</a>
+      </p>
+    </div>
+
+    <div style="margin-top: 100px;">
+      <img class="annotableImage" src="800px-Cat_and_Dog_Game.jpg">
+      <p class="image-caption">
+        Cat about to play with the dog and his guarded balls. Public Domain. Source:
+        <a href="https://commons.wikimedia.org/wiki/File:Cat_and_Dog_Game.jpg">Wikimedia
+          Commons</a>
+      </p>
+    </div>
+
+    <div style="margin-top: 100px;">
+      <img class="annotableImage" src="712px-June_odd-eyed-cat_cropped.jpg">
+      <p class="image-caption">
+        A white cat with a one yellow eye and one blue eye. Public Domain. Source:
+        <a href="https://commons.wikimedia.org/wiki/File:June_odd-eyed-cat_cropped.jpg">Wikimedia
+          Commons</a>
+      </p>
+    </div>
+  </div>
+</body>
+
+</html>

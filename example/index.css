@@ -1,0 +1,53 @@
+body {
+    font-family: "Lato", sans-serif;
+    background-color: #ededed;
+    font-family: sans-serif;
+    line-height: 160%;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+.sidenav {
+    height: 100%;
+    width: 300px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    padding-top: 20px;
+    color: white;
+    text-align: center;
+}
+
+.sidenav a {
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    color: #818181;
+    display: block;
+}
+
+.sidenav a:hover {
+    color: #f1f1f1;
+}
+
+.main {
+    margin-left: 160px;
+    padding: 0px 10px;
+    text-align: center;
+}
+
+@media screen and (max-height: 450px) {
+    .sidenav {
+        padding-top: 15px;
+    }
+}
+
+.image-caption {
+    line-height: normal;
+    font-weight: bold;
+    font-size: 12px;
+}

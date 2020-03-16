@@ -20,7 +20,7 @@
     top: 0px;
     left: 0px;
     z-index: 0;
-    opacity: 0.8;
+    opacity: 0.6;
 }
 
 .dda-annotationlayer .dda-popup {
@@ -133,15 +133,6 @@
 .dda-annotationlayer .dda-popup-buttons .dda-popup-button-rotate:hover {
     color: #fff;
     background-color: #f6c23e;
-}
-
-.dda-annotationlayer .dda-popup-buttons .dda-popup-button-move {
-    color: #1cc88a; /*#4e73df*/
-}
-
-.dda-annotationlayer .dda-popup-buttons .dda-popup-button-move:hover {
-    color: #fff;
-    background-color: #1cc88a; /*#4e73df*/
 }
 
 .dda-annotationlayer .dda-hint{

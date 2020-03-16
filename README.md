@@ -63,16 +63,14 @@ var options = {
     hint: { //hint settings
         enabled: true, //if false, not show the hint
         message: "Drag and Drop to Annotate", //hint message
-        icon: '<i class="far fa-question-circle"></i>', //hint icon
-        messageMove: "Move to set new annotation position", //message on start move annotation
-        iconMove: '<i class="fas fa-info"></i>',  //icon on start move annotation
+        icon: '<i class="far fa-question-circle"></i>', //hint icon        
+        messageMove: "Drag to set new annotation position", //message on mouseover annotation
+        iconMove: '<i class="fas fa-info"></i>',  //icon on mouseover annotation
         messageRotate: "Move to set new annotation rotation",  //message on start rotate annotation
         iconRotate: '<i class="fas fa-info"></i>',  //icon on start rotate annotation
     },
 
-    popup: { //popup settings
-        buttonMove: '<i class="fas fa-arrows-alt"></i>', //icon or text of move button 
-        tooltipMove: "Change the position of annotation", //tooltip of move button 
+    popup: { //popup settings        
         buttonRotate: '<i class="fas fa-sync-alt"></i>', //icon or text of rotate button 
         tooltipRotate: "Change the rotation of annotation", //tooltip of rotate button 
         buttonRemove: '<i class="fas fa-trash"></i>', //icon or text of remove button 
@@ -86,6 +84,7 @@ var options = {
         hiBorderColor: '#fff000', // border color for highlighted annotation  
         hiBorderSize: 2.2,  //border width for highlighted annotation  [1-12]    
         imageBorder: true, //if false, not show the border on annotation with image
+        foreground: true //if false, not brings the annotation to the foreground when the mouseover
     }
 };
 ```

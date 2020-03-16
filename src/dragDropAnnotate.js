@@ -62,10 +62,25 @@
             return area <= self.area;
         };
 
+        /** Returns the coordinates of the lowest vertex **/
+        this.getLowerVertex = function () {
+            if (!_vertices) _createVertices();
+            if (!_vertices.lowerVertex) {
+                _vertices.lowerVertex = { x: _vertices.botL.x, y: _vertices.botL.y };
+                Object.keys(_vertices).forEach(key => {
+                    if (_vertices.lowerVertex.y < _vertices[key].y) _vertices.lowerVertex = { x: _vertices[key].x, y: _vertices[key].y }
+                });
+            }
+            return _vertices.lowerVertex;
+        }
+
         /** Update correctly the center or rotation **/
         this.update = function (center, rotation) {
             if (center) self.center = center;
-            if (rotation) self.rotation = rotation;
+            if (rotation) {
+                while (rotation > 360) rotation -= 360;
+                self.rotation = rotation;
+            }
             _vertices = undefined;
         };
 
@@ -187,10 +202,8 @@
 
         /** Constructor **/
         var _buttonGroup = $('<div class="dda-popup-buttons"></div>');
-        var _buttonMove = $('<button role="button" class="dda-popup-button-move" data-toggle="tooltip" title="' + opts["popup"]["tooltipMove"] + '">' + opts["popup"]["buttonMove"] + '</button>');
         var _buttonRotate = $('<button role="button" class="dda-popup-button-rotate" data-toggle="tooltip" title="' + opts["popup"]["tooltipRotate"] + '">' + opts["popup"]["buttonRotate"] + '</button>');
         var _buttonRemove = $('<button role="button" class="dda-popup-button-remove" data-toggle="tooltip" title="' + opts["popup"]["tooltipRemove"] + '">' + opts["popup"]["buttonRemove"] + '</button>');
-        _buttonGroup.append(_buttonMove);
         _buttonGroup.append(_buttonRotate);
         _buttonGroup.append(_buttonRemove);
 
@@ -206,9 +219,6 @@
         _popup.mouseover(function (event) { _mouseIsAbove = true; });
         _popup.mouseout(function (event) { _mouseIsAbove = false; });
 
-        _buttonMove.click(function (event) {
-            if (_cachedAnnotation.editable) annotator.startMoveAnnotation(_cachedAnnotation);
-        });
         _buttonRotate.click(function (event) {
             if (_cachedAnnotation.editable) annotator.startRotateAnnotation(_cachedAnnotation);
         });
@@ -238,7 +248,7 @@
                     _popup.hide();
                 }
                 clearTimeout(timer);
-            }, 150);
+            }, 300);
         };
 
         /** Check if Popup is hidden **/
@@ -312,6 +322,7 @@
             var topAnnotation = _getAnnotationAt(coordinate);
             if (topAnnotation.length == 0) {
                 _currentAnnotation = topAnnotation = undefined;
+                _canvas.css('cursor', 'default');
                 _popup.hide();
                 self.redrawAnnotations();
                 return;
@@ -320,9 +331,11 @@
             if (_popup.isHidden() || _currentAnnotation != topAnnotation[0]) {
                 if (_currentAnnotation != topAnnotation[0]) {
                     _currentAnnotation = topAnnotation[0];
+                    if (_hint.show) _hint.show(opts["hint"]["iconMove"], opts["hint"]["messageMove"]);
+                    _canvas.css('cursor', 'move');
                     self.redrawAnnotations(_currentAnnotation);
                 }
-                _popup.show(_currentAnnotation, { x: event.offsetX, y: event.offsetY });
+                _popup.show(_currentAnnotation, _getPopupPosition());
             }
         });
 
@@ -334,6 +347,26 @@
             }
         });
 
+        _canvas.mousedown(function (event) {
+            if (!_currentAnnotation || _editAnnotationFn) return;
+            _popup.hide(true);
+            var old_annotation = _currentAnnotation.print();
+
+            var offsetOfCenter = _toOriginalCoord(event.offsetX, event.offsetY);
+            offsetOfCenter = { x: offsetOfCenter.x - _currentAnnotation.geometry.center.x, y: offsetOfCenter.y - _currentAnnotation.geometry.center.y };
+
+            _editAnnotationFn = function (coordinate) {
+                if (coordinate) {
+                    _currentAnnotation.geometry.update({
+                        x: coordinate.x - offsetOfCenter.x,
+                        y: coordinate.y - offsetOfCenter.y
+                    });
+                    self.redrawAnnotations(_currentAnnotation);
+                }
+                return { new: _currentAnnotation, old_print: old_annotation };
+            };
+        });
+
         /** Private method **/
 
         /** Transform the resized coordinate to original coordinate **/
@@ -341,10 +374,22 @@
             return { x: parseInt((x / _canvas.width()) * _canvas[0].width), y: parseInt((y / _canvas.height()) * _canvas[0].height) };
         };
 
+        /** Transform the original coordinate to resized coordinate **/
+        var _fromOriginalCoord = function (x, y) {
+            return { x: parseInt((x * _canvas.width()) / _canvas[0].width), y: parseInt((y * _canvas.height()) / _canvas[0].height) };
+        };
+
         /** Get the UI coordinate on drang & drop **/
         var _getUiCoordinate = function (oLeft, oTop) {
             return _toOriginalCoord((oLeft - _canvas.offset().left), (oTop - _canvas.offset().top));
         };
+
+        /** Get the popup position from the current annotation **/
+        var _getPopupPosition = function () {
+            if (!_currentAnnotation) return;
+            var loverVertex = _currentAnnotation.geometry.getLowerVertex();
+            return _fromOriginalCoord(loverVertex.x, loverVertex.y);
+        }
 
         /** Draw an annotation **/
         var _drawAnnotation = function (annotation, highlight = false) {
@@ -418,11 +463,13 @@
         /** Redraw the annotations **/
         this.redrawAnnotations = function (annotationToHighlight = undefined) {
             self.clear();
-            var highlight = (!annotationToHighlight) ? false : true;
+            var foregroundAnno = undefined;
             _annotations.forEach(annotation => {
-                if (highlight) _drawAnnotation(annotation, (annotationToHighlight instanceof Object) ? (annotation == annotationToHighlight) : annotation.id === annotationToHighlight);
-                else _drawAnnotation(annotation);
+                var isEqual = (!annotationToHighlight) ? false : ((annotationToHighlight instanceof Object) ? (annotation == annotationToHighlight) : annotation.id === annotationToHighlight);
+                if (isEqual && opts["annotationStyle"]["foreground"]) foregroundAnno = annotation;
+                else _drawAnnotation(annotation, isEqual);
             });
+            if (foregroundAnno) _drawAnnotation(foregroundAnno, true);
         };
 
         /** Returns all annotations **/
@@ -457,32 +504,23 @@
             if (fireEvent) fireEventFn(Events.ANNOTATION_CREATED, [annotation.print()]);
         };
 
-        /** Move the annotation **/
-        this.startMoveAnnotation = function (annotation) {
-            _popup.hide(true);
-            if (_hint.show) _hint.show(opts["hint"]["iconMove"], opts["hint"]["messageMove"]);
-            var old_annotation = annotation.print();
-            _editAnnotationFn = function (coordinate) {
-                if (coordinate) {
-                    annotation.geometry.update(coordinate);
-                    self.redrawAnnotations(_currentAnnotation);
-                }
-                return { new: annotation, old_print: old_annotation };
-            };
-        };
-
         /** Rotate the annotation **/
         this.startRotateAnnotation = function (annotation) {
             _popup.hide(true);
             if (_hint.show) _hint.show(opts["hint"]["iconRotate"], opts["hint"]["messageRotate"]);
+            _canvas.css('cursor', 'default');
             var old_annotation = annotation.print();
+
+            var startRotation;
             _editAnnotationFn = function (coordinate) {
                 if (coordinate) {
+                    var rotation = Math.atan2(coordinate.y - annotation.geometry.center.y, coordinate.x - annotation.geometry.center.x) * 180 / Math.PI;
                     annotation.geometry.update(
                         undefined,
-                        - Math.atan2(coordinate.y - annotation.geometry.center.y, coordinate.x - annotation.geometry.center.x) * 180 / Math.PI
+                        annotation.geometry.rotation + (startRotation - rotation)
                     );
-                    self.redrawAnnotations(_currentAnnotation);
+                    startRotation = rotation;
+                    self.redrawAnnotations(annotation);
                 }
                 return { new: annotation, old_print: old_annotation };
             };
@@ -542,7 +580,7 @@
                     annotationPrinted["position"]["center"],
                     annotationPrinted["width"] || image.naturalWidth,
                     annotationPrinted["height"] || image.naturalHeight,
-                    annotationPrinted["position"]["rotation"]
+                    annotationPrinted["rotation"]
                 ),
                 annotationPrinted["editable"]
             ), replace, false);
@@ -664,14 +702,12 @@
             "enabled": true, //if false, not show the hint
             "message": "Drag and Drop to Annotate", //hint message
             "icon": '<i class="far fa-question-circle"></i>', //hint icon
-            "messageMove": "Move to set new annotation position", //message on start move annotation
-            "iconMove": '<i class="fas fa-info"></i>',  //icon on start move annotation
+            "messageMove": "Drag to set new annotation position", //message on mouseover annotation
+            "iconMove": '<i class="fas fa-info"></i>',  //icon on mouseover annotation
             "messageRotate": "Move to set new annotation rotation",  //message on start rotate annotation
             "iconRotate": '<i class="fas fa-info"></i>',  //icon on start rotate annotation
         },
         "popup": { //popup settings
-            "buttonMove": '<i class="fas fa-arrows-alt"></i>', //icon or text of move button 
-            "tooltipMove": "Change the position of annotation", //tooltip of move button 
             "buttonRotate": '<i class="fas fa-sync-alt"></i>', //icon or text of rotate button 
             "tooltipRotate": "Change the rotation of annotation", //tooltip of rotate button 
             "buttonRemove": '<i class="fas fa-trash"></i>', //icon or text of remove button 
@@ -684,6 +720,7 @@
             "hiBorderColor": '#fff000', // border color for highlighted annotation  
             "hiBorderSize": 2.2,  //border width for highlighted annotation  [1-12]    
             "imageBorder": true, //if false, not show the border on image annotation 
+            "foreground": true //if false, not brings the annotation to the foreground when the mouseover
         }
     };
 

@@ -466,8 +466,12 @@
             var foregroundAnno = undefined;
             _annotations.forEach(annotation => {
                 var isEqual = (!annotationToHighlight) ? false : ((annotationToHighlight instanceof Object) ? (annotation == annotationToHighlight) : annotation.id === annotationToHighlight);
-                if (isEqual && opts["annotationStyle"]["foreground"]) foregroundAnno = annotation;
-                else _drawAnnotation(annotation, isEqual);
+                if (isEqual && opts["annotationStyle"]["foreground"]) {
+                    if (foregroundAnno) _drawAnnotation(foregroundAnno, true);
+                    foregroundAnno = annotation;
+                    return;
+                }
+                _drawAnnotation(annotation, isEqual);
             });
             if (foregroundAnno) _drawAnnotation(foregroundAnno, true);
         };

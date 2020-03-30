@@ -28,6 +28,7 @@ img {
     text-decoration: none;
     color: #818181;
     display: block;
+    margin-top: 20px;
 }
 
 .sidenav a:hover {

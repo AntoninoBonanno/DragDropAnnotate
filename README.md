@@ -1,6 +1,17 @@
 # DragDropAnnotate
 jQuery plugin to annotate images easily with drag and drop.
-**DragDropAnnotate** is an image annotation toolkit written in jQuery/JavaScript.
+
+**DragDropAnnotate** is a lightweight image annotation tool that make it easy to add custom markers, comments, hotspots to images via drag and drop.
+
+Supports rectangle, and image annotations. The drag and drop functionality based on jQuery UI draggable widget.
+
+### More Features
+* Hint messages on mouse hover.
+* Popup window showing descriptions and tools of the annotation.
+* Custom annotation styles.
+* Allows to move and rotate the annotaion with mouse.
+
+[Official Download with demo](https://github.com/AntoninoBonanno/DragDropAnnotate/releases)
 
 Are you looking for an image annotation toolkit (not drag and drop) written in JavaScript? Check out [this project](https://github.com/AntoninoBonanno/annotorious).
 
@@ -44,7 +55,7 @@ Or use optional configuration parameters:
 ```
 var annotable = $("#imageExample").annotable({
     draggable: ".annotation",
-    ...
+    ... // other optional settings 
 });    
 ```
 

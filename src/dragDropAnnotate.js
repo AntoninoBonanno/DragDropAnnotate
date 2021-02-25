@@ -11,10 +11,48 @@
         ANNOTATION_UPDATED: 'onAnnotationUpdated' //An existing annotation was updated
     };
 
-    /** Return the object of Coordinate for print **/
+    /**
+     * Disable touch events on drag started 
+     */
+    var dragStarted = false;
+
+    /**
+     * Return the object of Coordinate for print
+     * @param {*} coordinate 
+     */
     function printCoordinate(coordinate) {
         return { "x": coordinate.x, "y": coordinate.y };
     }
+
+    /**
+     * Touch Handler
+     * @param {*} event ["touchstart", "touchmove", "touchend", "touchcancel"]
+     */
+    function touchHandler(event) {
+        var touch = event.changedTouches[0];
+
+        var simulatedEvent = document.createEvent("MouseEvent");
+        simulatedEvent.initMouseEvent({
+            touchstart: "mousedown",
+            touchmove: "mousemove",
+            touchend: "mouseup"
+        }[event.type], true, true, window, 1,
+            touch.screenX, touch.screenY,
+            touch.clientX, touch.clientY, false,
+            false, false, false, 0, null);
+
+        touch.target.dispatchEvent(simulatedEvent);
+
+        if (dragStarted) {
+            event.preventDefault();
+        }
+    }
+
+    // Add Touch Handler
+    document.addEventListener("touchstart", touchHandler, { passive: false });
+    document.addEventListener("touchmove", touchHandler, { passive: false });
+    document.addEventListener("touchend", touchHandler, { passive: false });
+    document.addEventListener("touchcancel", touchHandler, { passive: false });
 
     /**
      * Geometry of rectangle annotation
@@ -668,13 +706,20 @@
             var opts = $.extend(true, {}, $.fn.annotable.defaults, methodOrOptions);
             var instances = (this.length > 1) ? [] : undefined;
 
-            if (!$(opts["draggable"]).is(":ui-draggable"))
+            if (!$(opts["draggable"]).is(":ui-draggable")) {
                 $(opts["draggable"]).draggable({
                     helper: 'clone',
                     ghosting: true,
                     cursorAt: { top: 0, left: 0 },
-                    revert: 'invalid'
+                    revert: 'invalid',
+                    start: function () {
+                        dragStarted = true;
+                    },
+                    stop: function () {
+                        dragStarted = false;
+                    }
                 });
+            }
         }
 
         var args = Array.prototype.slice.call(arguments, 1);

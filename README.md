@@ -9,7 +9,7 @@ Supports rectangle, and image annotations. The drag and drop functionality based
 * Hint messages on mouse hover.
 * Popup window showing descriptions and tools of the annotation.
 * Custom annotation styles.
-* Allows to move and rotate the annotaion with mouse.
+* Allows to move and rotate the annotaion with mouse and touch.
 
 [Official Download with demo](https://github.com/AntoninoBonanno/DragDropAnnotate/releases)
 

@@ -4,6 +4,8 @@ jQuery plugin to annotate images easily with drag and drop.
 
 Supports rectangle, and image annotations. The drag and drop functionality based on jQuery UI draggable widget.
 
+<p align="center"><img src="https://raw.githubusercontent.com/AntoninoBonanno/DragDropAnnotate/master/DragDropAnnotate.png" data-canonical-src="https://raw.githubusercontent.com/AntoninoBonanno/DragDropAnnotate/master/DragDropAnnotate.png" width="600" height="400" /></p>
+
 ### More Features
 * Hint messages on mouse hover.
 * Popup window showing descriptions and tools of the annotation.
@@ -24,7 +26,7 @@ Supports rectangle, and image annotations. The drag and drop functionality based
 <!-- Fontawesome -->
 <link rel="stylesheet" href="./vendor/fontawesome-free-5.12.1-web/css/all.min.css" type="text/css" />
 
-<!-- DragDropAnnotate  -->
+<!-- DragDropAnnotate -->
 <link rel="stylesheet" href="./src/dragDropAnnotate.css" type="text/css" />
 <script src="./src/dragDropAnnotate.js"></script>
 ```

@@ -172,7 +172,7 @@
         this.text = text;
         if (image instanceof Image) this.image = image;
         this.geometry = geometry;
-        this.editable = editable;
+        this.editable = editable != "false";
         this.created_at = Date.now();
 
         var self = this;
@@ -352,9 +352,9 @@
                         _getUiCoordinate(ui.offset.left, ui.offset.top),
                         ui.draggable.attr("annotation-width") || ui.draggable[0].naturalWidth,
                         ui.draggable.attr("annotation-height") || ui.draggable[0].naturalHeight,
-                        ui.draggable.attr("annotation-rotation"),
-                        ui.draggable.attr("annotation-editable")
-                    )
+                        ui.draggable.attr("annotation-rotation")
+                    ),
+                    ui.draggable.attr("annotation-editable")
                 );
             },
             out: function (event, ui) {

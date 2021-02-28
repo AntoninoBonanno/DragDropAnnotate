@@ -13,7 +13,7 @@ Supports rectangle, and image annotations. The drag and drop functionality based
 * Popup window showing descriptions and tools of the annotation.
 * Custom annotation styles.
 * Allows to move and rotate the annotaion with mouse and touch.
-* Support touch gestures
+* Support touch devices
 
 [Official Page](https://antoninobonanno.github.io/DragDropAnnotate) - [Demo](https://antoninobonanno.github.io/DragDropAnnotate/example/index.html)
 

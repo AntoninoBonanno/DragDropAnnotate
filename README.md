@@ -1,4 +1,7 @@
-# DragDropAnnotate
+# DragDrop Annotate
+
+![DragDropAnnotate](https://antoninobonanno.github.io/DragDropAnnotate/blob/master/DragDropAnnotate.png?raw=true)
+
 jQuery plugin to annotate images easily with drag and drop.
 
 **DragDropAnnotate** is a lightweight image annotation tool that make it easy to add custom markers, comments, hotspots to images via drag and drop.
@@ -10,8 +13,10 @@ Supports rectangle, and image annotations. The drag and drop functionality based
 * Popup window showing descriptions and tools of the annotation.
 * Custom annotation styles.
 * Allows to move and rotate the annotaion with mouse and touch.
+* Support touch gestures
 
-[Official Download with demo](https://github.com/AntoninoBonanno/DragDropAnnotate/releases)
+[Official Page](https://antoninobonanno.github.io/DragDropAnnotate/example/index.html)
+[Demo](https://antoninobonanno.github.io/DragDropAnnotate/example/index.html)
 
 Are you looking for an image annotation toolkit (not drag and drop) written in JavaScript? Check out [this project](https://github.com/AntoninoBonanno/annotorious).
 
@@ -30,7 +35,7 @@ To set up **DragDropAnnotate** on a Web page, add this code to your page head:
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" crossorigin="anonymous"></script>
 
-<!-- Fontawesome  -->
+<!-- Fontawesome -->
 <link rel="stylesheet" href="./vendor/fontawesome-free-5.12.1-web/css/all.min.css" type="text/css" />
 
 <link rel="stylesheet" href="./src/dragDropAnnotate.css" type="text/css" />

@@ -65,6 +65,13 @@
     text-align: left;
 }
 
+.dda-annotationlayer .dda-popup-textarea{
+    float: left;
+    margin: 7px 8px 4px 8px;
+    cursor: default;   
+    border: 1px solid #ededed;
+}
+
 .dda-annotationlayer .dda-popup-buttons {
     float: right;
     display: -webkit-inline-box;
@@ -121,18 +128,32 @@
     color: #e74a3b;
 }
 
-.dda-annotationlayer .dda-popup-buttons .dda-popup-button-remove:hover {
-    color: #fff;
-    background-color: #e74a3b;
-}
-
 .dda-annotationlayer .dda-popup-buttons .dda-popup-button-rotate {
     color: #f6c23e;
 }
 
-.dda-annotationlayer .dda-popup-buttons .dda-popup-button-rotate:hover {
-    color: #fff;
-    background-color: #f6c23e;
+@media (focus: focus) and (pointer: coarse) {
+    .dda-annotationlayer .dda-popup-buttons .dda-popup-button-remove:focus {
+        outline: none !important;
+        border: 1px solid #e74a3b;
+    }
+
+    .dda-annotationlayer .dda-popup-buttons .dda-popup-button-rotate:focus {
+        outline: none !important;
+        border: 1px solid #f6c23e;
+    }
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .dda-annotationlayer .dda-popup-buttons .dda-popup-button-remove:hover {
+        color: #fff;
+        background-color: #e74a3b;
+    }
+
+    .dda-annotationlayer .dda-popup-buttons .dda-popup-button-rotate:hover {
+        color: #fff;
+        background-color: #f6c23e;
+    }
 }
 
 .dda-annotationlayer .dda-hint{

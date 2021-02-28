@@ -91,7 +91,9 @@ var options = {
         tooltipRotate: "Change the rotation of annotation", //tooltip of rotate button 
         buttonRemove: '<i class="fas fa-trash"></i>', //icon or text of remove button 
         tooltipRemove: "Remove the annotation", //tooltip of remove button 
-        tooltipText: "Text of annotation", //tooltip of annotation text 
+        tooltipText: "Text of annotation", //tooltip of annotation text
+        tooltipTextarea: "Text of annotation", //tooltip of annotation textarea input
+        placeholderTextarea: "Enter Text", //placeholder of annotation textarea input
     },
 
     annotationStyle: { //annotation style 
@@ -125,7 +127,7 @@ var options = {
 | annotation-width | `50` | Width of annotation expressed in pixels (px). If use Annotation with image, the default value is `naturalWidth` of image. |
 | annotation-height | `50` | Height of annotation expressed in pixels (px). If use Annotation with image, the default value is `naturalHeight` of image. |
 | annotation-rotation | `0` | Rotation of the annotation with respect to the x-axis, expressed in degrees. |
-| annotation-editable | `true` | if true enable to edit or delete the annotation |
+| annotation-editable | `"noText"` | `"disabled"`: the annotation is not editable. `"noText"`: the annotation can be rotated, moved and deleted `"full"`: the annotation can be edited. |
 
 Pixels of annotation are relative to natural size of annotable element.
 
@@ -173,8 +175,8 @@ var myAnnotation = {
     /** Text of annotation, is shown on mouseover. **/
     text: "My annotation", 
 
-    /** If true enable to edit or delete the annotation. [OPTIONAL - default is true] **/
-    editable: true, 
+    /** "disabled", "noText", "full" [OPTIONAL - default is "noText"] **/
+    editable: "noText", 
 
     /** Position of annotation inside the annotable element (pixels are relative to natural size of annotable element) **/
     position: {
@@ -235,7 +237,7 @@ Adds an event handler function. You can register for the following events:
 
 - `onMouseMoveOverItem` (event, coordinate): Fired when the mouse move inside the annotatable media area.
 - `onAnnotationCreated` (event, annotation): Fired when an annotation was created.
-- `onAnnotationUpdated` (event, annotation): Fired when an existing annotation was edited/updated.
+- `onAnnotationUpdated` (event, annotation): Fired when an existing annotation was updated (edited, rotated or moved).
 - `onAnnotationRemoved` (event, annotation): Fired when an annotation is removed from an item.
 
 Example:

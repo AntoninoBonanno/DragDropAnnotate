@@ -20,6 +20,12 @@
         ANNOTATION_UPDATED: 'onAnnotationUpdated' //An existing annotation was updated
     };
 
+    var AnnotationEdits = {
+        DISABLED: 'disabled', //The annotation is not editable
+        NO_TEXT: 'noText', //The annotation can be rotated, moved and deleted
+        FULL: 'full' //The annotation can be edited
+    };
+
     /**
      * Check if touch drag started 
      */
@@ -165,14 +171,14 @@
      * @param {Image} image JS Image
      * @param {String} text Text of annotation
      * @param {Geometry} geometry Geometry of annotation
-     * @param {Boolean} editable if true enable to edit annotation
+     * @param {String} editable Behavior of the annotation for editing
      */
-    var Annotation = function (id, image, text, geometry, editable = true) {
+    var Annotation = function (id, image, text, geometry, editable = AnnotationEdits.NO_TEXT) {
         this.id = id;
         this.text = text;
         if (image instanceof Image) this.image = image;
         this.geometry = geometry;
-        this.editable = editable != "false";
+        this.editable = editable;
         this.created_at = Date.now();
 
         var self = this;
@@ -265,7 +271,10 @@
         _buttonGroup.append(_buttonRemove);
 
         var _popup = $('<div class="dda-popup"></div>').hide();
-        _popup.append($('<div class="dda-popup-text" data-toggle="tooltip" title="' + opts["popup"]["tooltipText"] + '"></div>'));
+        var _textarea = $('<textarea type="text" class="dda-popup-textarea" data-toggle="tooltip" title="' + opts["popup"]["tooltipTextarea"] + '" placeholder = "' + opts["popup"]["placeholderTextarea"] + '"></textarea>');
+        var _text = $('<div class="dda-popup-text" data-toggle="tooltip" title="' + opts["popup"]["tooltipText"] + '"></div>');
+        _popup.append($('<div></div>').append(_textarea));
+        _popup.append(_text);
         _popup.append(_buttonGroup);
         container.append(_popup);
 
@@ -277,10 +286,13 @@
         _popup.mouseout(event => _mouseIsAbove = false);
 
         _buttonRotate.click(event => {
-            if (_cachedAnnotation.editable) annotator.startRotateAnnotation(_cachedAnnotation);
+            annotator.startRotateAnnotation(_cachedAnnotation);
         });
         _buttonRemove.click(event => {
-            if (_cachedAnnotation.editable) annotator.removeAnnotation(_cachedAnnotation);
+            annotator.removeAnnotation(_cachedAnnotation);
+        });
+        _textarea.keyup(event => {
+            annotator.editTextAnnotation(_cachedAnnotation, _textarea.val());
         });
 
         /** Public method **/
@@ -288,10 +300,16 @@
         /** Show the Popup on specific position **/
         this.show = function (annotation, position) {
             _cachedAnnotation = annotation;
-            if (_cachedAnnotation.text) _popup.children(".dda-popup-text").show().html(_cachedAnnotation.text);
-            else _popup.children(".dda-popup-text").hide();
+            if (_cachedAnnotation.text) _text.show().html(_cachedAnnotation.text);
+            else _text.hide();
 
-            if (_cachedAnnotation.editable) _buttonGroup.show();
+            if (_cachedAnnotation.editable == AnnotationEdits.FULL) {
+                _text.hide();
+                _textarea.show().prop("disabled", false).removeAttr('style').val(_cachedAnnotation.text);
+            }
+            else _textarea.hide().prop("disabled", true);
+
+            if (_cachedAnnotation.editable != AnnotationEdits.DISABLED) _buttonGroup.show();
             else _buttonGroup.hide();
 
             _popup.css({ top: position.y, left: position.x }).show();
@@ -586,6 +604,8 @@
 
         /** Rotate the annotation **/
         this.startRotateAnnotation = function (annotation) {
+            if (annotation.editable == AnnotationEdits.DISABLED) return;
+
             _popup.hide(true);
             if (_hint.show) _hint.show(opts["hint"]["iconRotate"], opts["hint"]["messageRotate"]);
             _canvas.css('cursor', 'default');
@@ -608,6 +628,8 @@
 
         /** Remove the annotation **/
         this.removeAnnotation = function (annotation, fireEvent = true) {
+            if (annotation.editable == AnnotationEdits.DISABLED) return;
+
             _popup.hide(true);
             _annotations.splice(_annotations.indexOf(annotation), 1);
             if (fireEvent) fireEventFn(Events.ANNOTATION_REMOVED, [annotation.print()]);
@@ -623,7 +645,16 @@
             }
             _annotations = [];
             self.clear();
-        }
+        };
+
+        /** Edit the annotation text **/
+        this.editTextAnnotation = function (annotation, newText, fireEvent = true) {
+            if (annotation.editable != AnnotationEdits.FULL) return;
+
+            var old_print = annotation.print();
+            annotation.text = newText;
+            if (fireEvent) fireEventFn(Events.ANNOTATION_UPDATED, [annotation.print(), old_print]);
+        };
     };
 
     /** External API **/
@@ -800,6 +831,8 @@
             "buttonRemove": '<i class="fas fa-trash"></i>', //icon or text of remove button 
             "tooltipRemove": "Remove the annotation", //tooltip of remove button 
             "tooltipText": "Text of annotation", //tooltip of annotation text 
+            "tooltipTextarea": "Text of annotation", //tooltip of annotation textarea input
+            "placeholderTextarea": "Enter Text", //placeholder of annotation textarea input
         },
         "annotationStyle": { //annotation style 
             "borderColor": '#ffffff', // border color for annotation   

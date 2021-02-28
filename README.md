@@ -1,6 +1,6 @@
 # DragDrop Annotate
 
-![DragDropAnnotate](https://antoninobonanno.github.io/DragDropAnnotate/blob/master/DragDropAnnotate.png?raw=true)
+![DragDropAnnotate](https://raw.githubusercontent.com/AntoninoBonanno/DragDropAnnotate/master/DragDropAnnotate.png)
 
 jQuery plugin to annotate images easily with drag and drop.
 
@@ -15,8 +15,7 @@ Supports rectangle, and image annotations. The drag and drop functionality based
 * Allows to move and rotate the annotaion with mouse and touch.
 * Support touch gestures
 
-[Official Page](https://antoninobonanno.github.io/DragDropAnnotate/example/index.html)
-[Demo](https://antoninobonanno.github.io/DragDropAnnotate/example/index.html)
+[Official Page](https://antoninobonanno.github.io/DragDropAnnotate) - [Demo](https://antoninobonanno.github.io/DragDropAnnotate/example/index.html)
 
 Are you looking for an image annotation toolkit (not drag and drop) written in JavaScript? Check out [this project](https://github.com/AntoninoBonanno/annotorious).
 

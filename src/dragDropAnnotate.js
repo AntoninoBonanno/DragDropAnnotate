@@ -1,5 +1,14 @@
 "use strict";
 
+/**
+ * DragDropAnnotate
+ * https://github.com/AntoninoBonanno/DragDropAnnotate
+ * @author Bonanno Antonino 
+ * 
+ * jQuery plugin to annotate images easily with drag and drop.
+ * DragDropAnnotate is a lightweight image annotation tool that make it easy to add custom markers, comments, hotspots to images via drag and drop.
+ * Supports rectangle, and image annotations. The drag and drop functionality based on jQuery UI draggable widget.
+ */
 (function ($) {
 
     /** Internal classes (Protected) **/
@@ -12,9 +21,14 @@
     };
 
     /**
-     * Disable touch events on drag started 
+     * Check if touch drag started 
      */
-    var dragStarted = false;
+    var touchStarted = false;
+
+    /**
+     * Check if the device use touch 
+     */
+    var isTouch = false;
 
     /**
      * Return the object of Coordinate for print
@@ -26,10 +40,11 @@
 
     /**
      * Touch Handler
-     * @param {*} event ["touchstart", "touchmove", "touchend", "touchcancel"]
+     * @param {Event} event ["touchstart", "touchmove", "touchend", "touchcancel"]
      */
     function touchHandler(event) {
         var touch = event.changedTouches[0];
+        isTouch = true;
 
         var simulatedEvent = document.createEvent("MouseEvent");
         simulatedEvent.initMouseEvent({
@@ -43,8 +58,12 @@
 
         touch.target.dispatchEvent(simulatedEvent);
 
-        if (dragStarted) {
+        if (touchStarted) {
             event.preventDefault();
+            var elem = document.elementFromPoint(touch.clientX, touch.clientY);
+            if (elem instanceof HTMLCanvasElement) {
+                elem.dispatchEvent(simulatedEvent);
+            }
         }
     }
 
@@ -196,15 +215,15 @@
         var _hideTimer = undefined;
 
         var self = this;
-        _icon.mouseover(function () {
+        _icon.mouseover(() => {
             self.show();
         });
 
-        _icon.mouseout(function () {
+        _icon.mouseout(() => {
             self.hide();
         });
 
-        $(opts["draggable"]).mouseover(function () {
+        $(opts["draggable"]).mouseover(() => {
             self.show();
         });
 
@@ -216,7 +235,7 @@
             if (icon) _icon.html(icon);
             if (message) _message.html(message);
             _message.css("opacity", 1);
-            _hideTimer = setTimeout(function () {
+            _hideTimer = setTimeout(() => {
                 self.hide();
             }, 3000);
         };
@@ -254,13 +273,13 @@
         var _cachedAnnotation = undefined;
 
         var self = this;
-        _popup.mouseover(function (event) { _mouseIsAbove = true; });
-        _popup.mouseout(function (event) { _mouseIsAbove = false; });
+        _popup.mouseover(event => _mouseIsAbove = true);
+        _popup.mouseout(event => _mouseIsAbove = false);
 
-        _buttonRotate.click(function (event) {
+        _buttonRotate.click(event => {
             if (_cachedAnnotation.editable) annotator.startRotateAnnotation(_cachedAnnotation);
         });
-        _buttonRemove.click(function (event) {
+        _buttonRemove.click(event => {
             if (_cachedAnnotation.editable) annotator.removeAnnotation(_cachedAnnotation);
         });
 
@@ -271,6 +290,7 @@
             _cachedAnnotation = annotation;
             if (_cachedAnnotation.text) _popup.children(".dda-popup-text").show().html(_cachedAnnotation.text);
             else _popup.children(".dda-popup-text").hide();
+
             if (_cachedAnnotation.editable) _buttonGroup.show();
             else _buttonGroup.hide();
 
@@ -279,9 +299,9 @@
 
         /** Hide the Popup if there is no interaction or force to hide **/
         this.hide = function (force = false) {
-            if (self.isHidden() || (_mouseIsAbove && !force)) return;
-            var timer = setTimeout(function () {
-                if (!_mouseIsAbove || force) {
+            if (self.isHidden() || (!isTouch && _mouseIsAbove && !force)) return;
+            var timer = setTimeout(() => {
+                if (isTouch || !_mouseIsAbove || force) {
                     _cachedAnnotation = undefined;
                     _popup.hide();
                 }
@@ -344,7 +364,7 @@
             }
         });
 
-        _canvas.mousemove(function (event) {
+        _canvas.mousemove(event => {
             var coordinate = _toOriginalCoord(event.offsetX, event.offsetY);
             fireEventFn(Events.MOUSE_MOVE_ANNOTATABLE_ITEM, printCoordinate(coordinate));
 
@@ -355,7 +375,10 @@
                 return;
             }
 
-            if (_editAnnotationFn) { _editAnnotationFn(coordinate); return; }
+            if (_editAnnotationFn) {
+                _editAnnotationFn(coordinate);
+                return;
+            }
 
             var topAnnotation = _getAnnotationAt(coordinate);
             if (topAnnotation.length == 0) {
@@ -377,17 +400,26 @@
             }
         });
 
-        _canvas.mouseup(function (event) {
+        _canvas.mouseup(event => {
             if (_editAnnotationFn) {
                 var edited = _editAnnotationFn();
                 fireEventFn(Events.ANNOTATION_UPDATED, [edited.new.print(), edited.old_print]);
                 _editAnnotationFn = undefined;
             }
+            touchStarted = false;
         });
 
-        _canvas.mousedown(function (event) {
+        _canvas.mousedown(event => {
+            if (isTouch && !touchStarted) {
+                touchStarted = true;
+                event.type = "mousemove";
+                _canvas.trigger(event);
+            }
+
             if (!_currentAnnotation || _editAnnotationFn) return;
-            _popup.hide(true);
+
+            if (!isTouch) _popup.hide(true);
+
             var old_annotation = _currentAnnotation.print();
 
             var offsetOfCenter = _toOriginalCoord(event.offsetX, event.offsetY);
@@ -395,9 +427,15 @@
 
             _editAnnotationFn = function (coordinate) {
                 if (coordinate) {
+                    var newCoordinate = { x: coordinate.x - offsetOfCenter.x, y: coordinate.y - offsetOfCenter.y };
+
+                    if (isTouch && newCoordinate.x != _currentAnnotation.geometry.center.x && newCoordinate.y != _currentAnnotation.geometry.center.y) {
+                        _popup.hide();
+                    }
+
                     _currentAnnotation.geometry.update({
-                        x: coordinate.x - offsetOfCenter.x,
-                        y: coordinate.y - offsetOfCenter.y
+                        x: newCoordinate.x,
+                        y: newCoordinate.y
                     });
                     self.redrawAnnotations(_currentAnnotation);
                 }
@@ -630,7 +668,7 @@
 
         /** Find the Annotation from Annotation Printed**/
         var _findAnnotation = function (annotationPrinted) {
-            var annotation = _annotator.getAnnotations().find(function (annotation) {
+            var annotation = _annotator.getAnnotations().find(annotation => {
                 return annotation.isEqualPrint(annotationPrinted);
             });
             if (!annotation) $.error("Annotation not found.");
@@ -713,10 +751,10 @@
                     cursorAt: { top: 0, left: 0 },
                     revert: 'invalid',
                     start: function () {
-                        dragStarted = true;
+                        touchStarted = true;
                     },
                     stop: function () {
-                        dragStarted = false;
+                        touchStarted = false;
                     }
                 });
             }

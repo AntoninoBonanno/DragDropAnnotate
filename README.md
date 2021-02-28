@@ -121,13 +121,13 @@ var options = {
 #### Configuration attributes 
 
 | Attribute | Default | Description |
-| --- | :---: | --- |
+| --------- | :---------: | --------- |
 | annotation-id | `undefined` | Id of annotation. |
 | annotation-text | `undefined` | Text of annotation, is shown on mouseover. |
-| annotation-width | `50` | Width of annotation expressed in pixels (px). If use Annotation with image, the default value is `naturalWidth` of image. |
-| annotation-height | `50` | Height of annotation expressed in pixels (px). If use Annotation with image, the default value is `naturalHeight` of image. |
+| annotation-width | `50` | Width of annotation expressed in pixels (px).<br />If use Annotation with image, the default value is `naturalWidth` of image. |
+| annotation-height | `50` | Height of annotation expressed in pixels (px).<br />If use Annotation with image, the default value is `naturalHeight` of image. |
 | annotation-rotation | `0` | Rotation of the annotation with respect to the x-axis, expressed in degrees. |
-| annotation-editable | `"noText"` | `"disabled"`: the annotation is not editable. `"noText"`: the annotation can be rotated, moved and deleted `"full"`: the annotation can be edited. |
+| annotation-editable | `"noText"` | `"disabled"`: the annotation is not editable.<br />`"noText"`: the annotation can be rotated, moved and deleted.<br />`"full"`: the annotation can be edited. |
 
 Pixels of annotation are relative to natural size of annotable element.
 

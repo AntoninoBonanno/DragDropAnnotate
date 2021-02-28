@@ -40,11 +40,12 @@ var annotable = $("#imageExample").annotable();
 ```
 ### Initialize annotation item (draggable)
 
-- Annotation with image
+Annotation with image
     ```
     <img class="draggable-annotation" src="example.jpg" annotation-text="example" />
     ```
-- Simple Annotation
+
+Simple Annotation
     ```
     <div class="draggable-annotation" annotation-text="example" annotation-width="200" annotation-height="400"> Example </div>
     ```

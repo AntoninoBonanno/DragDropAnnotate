@@ -9,10 +9,12 @@ Supports rectangle, and image annotations. The drag and drop functionality based
 <p align="center"><img src="https://raw.githubusercontent.com/AntoninoBonanno/DragDropAnnotate/master/DragDropAnnotate.png" data-canonical-src="https://raw.githubusercontent.com/AntoninoBonanno/DragDropAnnotate/master/DragDropAnnotate.png" width="600" height="400" /></p>
 
 ### More Features
+* Quick annotations via drag and drop.
+* Annotate an image with another image or bounding box.
 * Hint messages on mouse hover.
 * Popup window showing descriptions and tools of the annotation.
 * Custom annotation styles.
-* Allows to move and rotate the annotaion with mouse and touch.
+* Allows to edit, move, rotate and delete the annotation with mouse and touch.
 * Support touch devices
 
 [Official Page](https://antoninobonanno.github.io/DragDropAnnotate) - [Demo](https://antoninobonanno.github.io/DragDropAnnotate/example/index.html)
@@ -127,7 +129,7 @@ var options = {
 | annotation-width | `50` | Width of annotation expressed in pixels (px).<br />If use Annotation with image, the default value is `naturalWidth` of image. |
 | annotation-height | `50` | Height of annotation expressed in pixels (px).<br />If use Annotation with image, the default value is `naturalHeight` of image. |
 | annotation-rotation | `0` | Rotation of the annotation with respect to the x-axis, expressed in degrees. |
-| annotation-editable | `"noText"` | `"disabled"`: the annotation is not editable.<br />`"noText"`: the annotation can be rotated, moved and deleted.<br />`"full"`: the annotation can be edited. |
+| annotation-editable | `"noText"` | `"disabled"`: the annotation is not editable.<br />`"noText"`: the annotation can be rotated, moved and deleted.<br />`"full"`: the annotation can be edited (text), rotated, moved and deleted. |
 
 Pixels of annotation are relative to natural size of annotable element.
 

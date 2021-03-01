@@ -38,19 +38,20 @@ Supports rectangle, and image annotations. The drag and drop functionality based
 ```
 <img id="imageExample" src="example.jpg">
 var annotable = $("#imageExample").annotable();  
-
 ```
 ### Initialize annotation item (draggable)
 
 Annotation with image
-    ```
-    <img class="draggable-annotation" src="example.jpg" annotation-text="example" />
-    ```
+
+```
+<img class="draggable-annotation" src="example.jpg" annotation-text="example" />
+```
 
 Simple Annotation
-    ```
-    <div class="draggable-annotation" annotation-text="example" annotation-width="200" annotation-height="400"> Example </div>
-    ```
+
+```
+<div class="draggable-annotation" annotation-text="example" annotation-width="200" annotation-height="400"> Example </div>
+```
 
 ## More details
 [View on GitHub](https://github.com/AntoninoBonanno/DragDropAnnotate)

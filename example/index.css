@@ -35,15 +35,34 @@ img {
     color: #f1f1f1;
 }
 
-.main {
-    margin-left: 160px;
-    padding: 0px 10px;
+.main { 
+    padding-left: 160px;
     text-align: center;
 }
 
 @media screen and (max-height: 450px) {
     .sidenav {
-        padding-top: 15px;
+        padding-top: 15px;  
+        line-height: 17px;
+        font-size: smaller;  
+        font-size: 12px;       
+    }
+    .sidenav a{
+        margin-bottom: 50px;
+    }
+}
+@media screen and (max-width: 769px) {
+    .sidenav {       
+        width: 145px;
+    }
+    .sidenav img.annotation{        
+        height: 65px !important;
+    }
+    .main{        
+        padding-left: 145px;
+    }
+    #gitLink{        
+        position: inherit !important;
     }
 }
 

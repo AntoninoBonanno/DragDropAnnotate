@@ -21,6 +21,8 @@ Supports rectangle, and image annotations. The drag and drop functionality based
 
 Are you looking for an image annotation toolkit (not drag and drop) written in JavaScript? Check out [this project](https://github.com/AntoninoBonanno/annotorious).
 
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/C0C46QJ0M)
+
 ## Dependencies
 
 * [jQuery](https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js) >= 1.8.2

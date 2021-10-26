@@ -17,6 +17,8 @@ Supports rectangle, and image annotations. The drag and drop functionality based
 
 <h3 style="text-align:center"><a href="https://antoninobonanno.github.io/DragDropAnnotate/example/index.html">Play Demo</a></h3>
 
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/C0C46QJ0M)
+
 ## Instructions
 
 ### Imports

@@ -3,8 +3,10 @@
 /**
  * DragDropAnnotate
  * https://github.com/AntoninoBonanno/DragDropAnnotate
- * @author Bonanno Antonino 
- * 
+ * @author Bonanno Antonino
+ * @version v1.1.0
+ * @licence LGPL-3.0-or-later
+ *
  * jQuery plugin to annotate images easily with drag and drop.
  * DragDropAnnotate is a lightweight image annotation tool that make it easy to add custom markers, comments, hotspots to images via drag and drop.
  * Supports rectangle, and image annotations. The drag and drop functionality based on jQuery UI draggable widget.
@@ -12,52 +14,51 @@
 (function ($) {
 
     /** Internal classes (Protected) **/
-
-    var Events = {
+    const Events = {
         MOUSE_MOVE_ANNOTATABLE_ITEM: 'onMouseMoveOverItem', //The mouse move inside the annotatable media area
         ANNOTATION_REMOVED: 'onAnnotationRemoved', //An annotation was removed
         ANNOTATION_CREATED: 'onAnnotationCreated', //An annotation was created
         ANNOTATION_UPDATED: 'onAnnotationUpdated' //An existing annotation was updated
     };
 
-    var AnnotationEdits = {
+    const AnnotationEdits = {
         DISABLED: 'disabled', //The annotation is not editable
         NO_TEXT: 'noText', //The annotation can be rotated, moved and deleted
         FULL: 'full' //The annotation can be edited
     };
 
     /**
-     * Check if touch drag started 
+     * Check if touch drag started
      */
-    var touchStarted = false;
+    let touchStarted = false;
 
     /**
-     * Check if the device use touch 
+     * Check if the device use touch
      */
-    var isTouch = false;
+    let isTouch = false;
 
     /**
      * Return the object of Coordinate for print
-     * @param {*} coordinate 
+     * @param {{x: number, y: number}} coordinate
      */
     function printCoordinate(coordinate) {
-        return { "x": coordinate.x, "y": coordinate.y };
+        return {"x": coordinate.x, "y": coordinate.y};
     }
 
     /**
      * Touch Handler
-     * @param {Event} event ["touchstart", "touchmove", "touchend", "touchcancel"]
+     * @param {TouchEvent} event the event ["touchstart", "touchmove", "touchend", "touchcancel"]
      */
     function touchHandler(event) {
-        var touch = event.changedTouches[0];
+        const touch = event.changedTouches[0];
         isTouch = true;
 
-        var simulatedEvent = document.createEvent("MouseEvent");
+        const simulatedEvent = document.createEvent("MouseEvent");
         simulatedEvent.initMouseEvent({
-            touchstart: "mousedown",
-            touchmove: "mousemove",
-            touchend: "mouseup"
-        }[event.type], true, true, window, 1,
+                touchstart: "mousedown",
+                touchmove: "mousemove",
+                touchend: "mouseup"
+            }[event.type], true, true, window, 1,
             touch.screenX, touch.screenY,
             touch.clientX, touch.clientY, false,
             false, false, false, 0, null);
@@ -66,7 +67,7 @@
 
         if (touchStarted) {
             event.preventDefault();
-            var elem = document.elementFromPoint(touch.clientX, touch.clientY);
+            const elem = document.elementFromPoint(touch.clientX, touch.clientY);
             if (elem instanceof HTMLCanvasElement) {
                 elem.dispatchEvent(simulatedEvent);
             }
@@ -74,50 +75,55 @@
     }
 
     // Add Touch Handler
-    document.addEventListener("touchstart", touchHandler, { passive: false });
-    document.addEventListener("touchmove", touchHandler, { passive: false });
-    document.addEventListener("touchend", touchHandler, { passive: false });
-    document.addEventListener("touchcancel", touchHandler, { passive: false });
+    document.addEventListener("touchstart", touchHandler, {passive: false});
+    document.addEventListener("touchmove", touchHandler, {passive: false});
+    document.addEventListener("touchend", touchHandler, {passive: false});
+    document.addEventListener("touchcancel", touchHandler, {passive: false});
 
     /**
      * Geometry of rectangle annotation
-     * @param {Object {x,y}} center Annotation coordinate relative to the center of the image
-     * @param {Number} width Width of annotation
-     * @param {Number} height Height of annotation
-     * @param {Number} rotation Rotation of annotation than the x-axis
+     * @param {{x: number,y: number}} center Annotation coordinate relative to the center of the image
+     * @param {number} width Width of annotation
+     * @param {number} height Height of annotation
+     * @param {number} rotation Rotation of annotation than the x-axis
      */
-    var Geometry = function (center, width = 50, height = 50, rotation = 0) {
+    const Geometry = function (center, width = 50, height = 50, rotation = 0) {
         this.center = center;
         this.width = width;
         this.height = height;
         this.rotation = rotation;
         this.area = width * height;
 
-        var _vertices = undefined;
+        let _vertices = undefined;
 
-        var self = this;
+        const self = this;
         /** Create the vertices of annotation for calculating the intersection with a point (also with rotation) */
-        var _createVertices = function () {
-            var angle = self.rotation * Math.PI / 180;
-            var sin = Math.sin(angle), cos = Math.cos(angle);
+        const _createVertices = function () {
+            const angle = self.rotation * Math.PI / 180;
+            const sin = Math.sin(angle), cos = Math.cos(angle);
 
-            var width = self.width / 2;
-            var height = self.height / 2;
+            const width = self.width / 2;
+            const height = self.height / 2;
 
-            var wc = (width * cos), hs = (height * sin), ws = (width * sin), hc = (height * cos);
+            const wc = (width * cos), hs = (height * sin), ws = (width * sin), hc = (height * cos);
 
             _vertices = {};
-            _vertices.topR = { x: (self.center.x + wc - hs), y: (self.center.y - ws - hc) };
-            _vertices.topL = { x: (self.center.x - wc - hs), y: (self.center.y + ws - hc) };
-            _vertices.botL = { x: (self.center.x - wc + hs), y: (self.center.y + ws + hc) };
-            _vertices.botR = { x: (self.center.x + wc + hs), y: (self.center.y - ws + hc) };
+            _vertices.topR = {x: (self.center.x + wc - hs), y: (self.center.y - ws - hc)};
+            _vertices.topL = {x: (self.center.x - wc - hs), y: (self.center.y + ws - hc)};
+            _vertices.botL = {x: (self.center.x - wc + hs), y: (self.center.y + ws + hc)};
+            _vertices.botR = {x: (self.center.x + wc + hs), y: (self.center.y - ws + hc)};
         };
 
-        /** Checks whether a geometry intersects a point **/
+        /**
+         * Checks whether a geometry intersects a point
+         * @param {number} px
+         * @param {number} py
+         * @returns {boolean}
+         */
         this.intersect = function (px, py) {
             if (!_vertices) _createVertices();
 
-            var area = Math.abs((px * _vertices.topL.y - _vertices.topL.x * py) + (_vertices.botR.x * py - px * _vertices.botR.y) + (_vertices.topL.x * _vertices.botR.y - _vertices.botR.x * _vertices.topL.y)) / 2;
+            let area = Math.abs((px * _vertices.topL.y - _vertices.topL.x * py) + (_vertices.botR.x * py - px * _vertices.botR.y) + (_vertices.topL.x * _vertices.botR.y - _vertices.botR.x * _vertices.topL.y)) / 2;
             area += Math.abs((px * _vertices.botR.y - _vertices.botR.x * py) + (_vertices.botL.x * py - px * _vertices.botL.y) + (_vertices.botR.x * _vertices.botL.y - _vertices.botL.x * _vertices.botR.y)) / 2;
             area += Math.abs((px * _vertices.botL.y - _vertices.botL.x * py) + (_vertices.topR.x * py - px * _vertices.topR.y) + (_vertices.botL.x * _vertices.topR.y - _vertices.topR.x * _vertices.botL.y)) / 2;
             area += Math.abs((px * _vertices.topR.y - _vertices.topR.x * py) + (_vertices.topL.x * py - px * _vertices.topL.y) + (_vertices.topR.x * _vertices.topL.y - _vertices.topL.x * _vertices.topR.y)) / 2;
@@ -127,19 +133,30 @@
 
         /** Returns the coordinates of the lowest vertex **/
         this.getLowerVertex = function () {
-            if (!_vertices) _createVertices();
+            if (!_vertices) {
+                _createVertices();
+            }
             if (!_vertices.lowerVertex) {
-                _vertices.lowerVertex = { x: _vertices.botL.x, y: _vertices.botL.y };
+                _vertices.lowerVertex = {x: _vertices.botL.x, y: _vertices.botL.y};
                 Object.keys(_vertices).forEach(key => {
-                    if (_vertices.lowerVertex.y < _vertices[key].y) _vertices.lowerVertex = { x: _vertices[key].x, y: _vertices[key].y }
+                    if (_vertices.lowerVertex.y < _vertices[key].y) _vertices.lowerVertex = {
+                        x: _vertices[key].x,
+                        y: _vertices[key].y
+                    }
                 });
             }
             return _vertices.lowerVertex;
         }
 
-        /** Update correctly the center or rotation **/
-        this.update = function (center, rotation) {
-            if (center) self.center = center;
+        /**
+         * Update correctly the center or rotation
+         * @param {{x: number, y: number}|undefined} center
+         * @param {number|undefined} rotation
+         */
+        this.update = function (center, rotation = undefined) {
+            if (center) {
+                self.center = center;
+            }
             if (rotation) {
                 while (rotation > 360) rotation -= 360;
                 self.rotation = rotation;
@@ -166,22 +183,24 @@
     };
 
     /**
-     * Annotation from a image
-     * @param {Number} id Id of annotation
-     * @param {Image} image JS Image
-     * @param {String} text Text of annotation
+     * Annotation from an image
+     * @param {number} id Id of annotation
+     * @param {HTMLImageElement|Image} image JS Image
+     * @param {string} text Text of annotation
      * @param {Geometry} geometry Geometry of annotation
-     * @param {String} editable Behavior of the annotation for editing
+     * @param {string} editable Behavior of the annotation for editing
      */
-    var Annotation = function (id, image, text, geometry, editable = AnnotationEdits.NO_TEXT) {
+    const Annotation = function (id, image, text, geometry, editable = AnnotationEdits.NO_TEXT) {
         this.id = id;
         this.text = text;
-        if (image instanceof Image) this.image = image;
+        if (image instanceof Image) {
+            this.image = image;
+        }
         this.geometry = geometry;
         this.editable = editable;
         this.created_at = Date.now();
 
-        var self = this;
+        const self = this;
         /** Return the object of Annotation for print **/
         this.print = function () {
             return {
@@ -194,33 +213,38 @@
             };
         };
 
-        /** Check if print is equal to Annotation **/
+        /**
+         * Check if print is equal to Annotation
+         * @param {Annotation|object} annotation
+         * @returns {boolean}
+         */
         this.isEqualPrint = function (annotation) {
-            if (!annotation instanceof Object) return false;
-            if (annotation["created_at"] == self.created_at) return true;
-            return false;
+            if (!annotation instanceof Object) {
+                return false;
+            }
+            return annotation["created_at"] === self.created_at;
         }
     };
 
     /**
      * Hint messages
-     * @param {jQuery} container 
+     * @param {jQuery} container
      * @param {Object} opts options
      */
-    var Hint = function (container, opts) {
+    const Hint = function (container, opts) {
         if (!opts["hint"]["enabled"]) return;
 
         /** Constructor **/
-        var _message = $('<div class="dda-hint-msg dda-opacity-fade" style="opacity: 0;">' + opts["hint"]["message"] + '</div>');
-        var _icon = $('<div class="dda-hint-icon">' + opts["hint"]["icon"] + '</div>');
-        var _hint = $('<div class="dda-hint"></div>');
+        const _message = $('<div class="dda-hint-msg dda-opacity-fade" style="opacity: 0;">' + opts["hint"]["message"] + '</div>');
+        const _icon = $('<div class="dda-hint-icon">' + opts["hint"]["icon"] + '</div>');
+        const _hint = $('<div class="dda-hint"></div>');
         _hint.append(_message);
         _hint.append(_icon);
         container.append(_hint);
 
-        var _hideTimer = undefined;
+        let _hideTimer = undefined;
 
-        var self = this;
+        const self = this;
         _icon.mouseover(() => {
             self.show();
         });
@@ -238,8 +262,12 @@
         /** Show the hint **/
         this.show = function (icon, message) {
             clearTimeout(_hideTimer);
-            if (icon) _icon.html(icon);
-            if (message) _message.html(message);
+            if (icon) {
+                _icon.html(icon);
+            }
+            if (message) {
+                _message.html(message);
+            }
             _message.css("opacity", 1);
             _hideTimer = setTimeout(() => {
                 self.hide();
@@ -257,41 +285,41 @@
 
     /**
      * The popup shown on mouse over annotation
-     * @param {Annotator} annotator 
-     * @param {jQuery} container 
+     * @param {Annotator} annotator
+     * @param {jQuery} container
      * @param {Object} opts options
      */
-    var Popup = function (annotator, container, opts) {
+    const Popup = function (annotator, container, opts) {
 
         /** Constructor **/
-        var _buttonGroup = $('<div class="dda-popup-buttons"></div>');
-        var _buttonRotate = $('<button role="button" class="dda-popup-button-rotate" data-toggle="tooltip" title="' + opts["popup"]["tooltipRotate"] + '">' + opts["popup"]["buttonRotate"] + '</button>');
-        var _buttonRemove = $('<button role="button" class="dda-popup-button-remove" data-toggle="tooltip" title="' + opts["popup"]["tooltipRemove"] + '">' + opts["popup"]["buttonRemove"] + '</button>');
+        const _buttonGroup = $('<div class="dda-popup-buttons"></div>');
+        const _buttonRotate = $('<button role="button" class="dda-popup-button-rotate" data-toggle="tooltip" title="' + opts["popup"]["tooltipRotate"] + '">' + opts["popup"]["buttonRotate"] + '</button>');
+        const _buttonRemove = $('<button role="button" class="dda-popup-button-remove" data-toggle="tooltip" title="' + opts["popup"]["tooltipRemove"] + '">' + opts["popup"]["buttonRemove"] + '</button>');
         _buttonGroup.append(_buttonRotate);
         _buttonGroup.append(_buttonRemove);
 
-        var _popup = $('<div class="dda-popup"></div>').hide();
-        var _textarea = $('<textarea type="text" class="dda-popup-textarea" data-toggle="tooltip" title="' + opts["popup"]["tooltipTextarea"] + '" placeholder = "' + opts["popup"]["placeholderTextarea"] + '"></textarea>');
-        var _text = $('<div class="dda-popup-text" data-toggle="tooltip" title="' + opts["popup"]["tooltipText"] + '"></div>');
+        const _popup = $('<div class="dda-popup"></div>').hide();
+        const _textarea = $('<textarea class="dda-popup-textarea" data-toggle="tooltip" title="' + opts["popup"]["tooltipTextarea"] + '" placeholder = "' + opts["popup"]["placeholderTextarea"] + '"></textarea>');
+        const _text = $('<div class="dda-popup-text" data-toggle="tooltip" title="' + opts["popup"]["tooltipText"] + '"></div>');
         _popup.append($('<div></div>').append(_textarea));
         _popup.append(_text);
         _popup.append(_buttonGroup);
         container.append(_popup);
 
-        var _mouseIsAbove = false;
-        var _cachedAnnotation = undefined;
+        let _mouseIsAbove = false;
+        let _cachedAnnotation = undefined;
 
-        var self = this;
-        _popup.mouseover(event => _mouseIsAbove = true);
-        _popup.mouseout(event => _mouseIsAbove = false);
+        const self = this;
+        _popup.mouseover(() => _mouseIsAbove = true);
+        _popup.mouseout(() => _mouseIsAbove = false);
 
-        _buttonRotate.click(event => {
+        _buttonRotate.click(() => {
             annotator.startRotateAnnotation(_cachedAnnotation);
         });
-        _buttonRemove.click(event => {
+        _buttonRemove.click(() => {
             annotator.removeAnnotation(_cachedAnnotation);
         });
-        _textarea.keyup(event => {
+        _textarea.keyup(() => {
             annotator.editTextAnnotation(_cachedAnnotation, _textarea.val());
         });
 
@@ -300,25 +328,32 @@
         /** Show the Popup on specific position **/
         this.show = function (annotation, position) {
             _cachedAnnotation = annotation;
-            if (_cachedAnnotation.text) _text.show().html(_cachedAnnotation.text);
-            else _text.hide();
+            if (_cachedAnnotation.text) {
+                _text.show().html(_cachedAnnotation.text);
+            } else {
+                _text.hide();
+            }
 
-            if (_cachedAnnotation.editable == AnnotationEdits.FULL) {
+            if (_cachedAnnotation.editable === AnnotationEdits.FULL) {
                 _text.hide();
                 _textarea.show().prop("disabled", false).removeAttr('style').val(_cachedAnnotation.text);
+            } else {
+                _textarea.hide().prop("disabled", true);
             }
-            else _textarea.hide().prop("disabled", true);
 
-            if (_cachedAnnotation.editable != AnnotationEdits.DISABLED) _buttonGroup.show();
-            else _buttonGroup.hide();
+            if (_cachedAnnotation.editable !== AnnotationEdits.DISABLED) {
+                _buttonGroup.show();
+            } else {
+                _buttonGroup.hide();
+            }
 
-            _popup.css({ top: position.y, left: position.x }).show();
+            _popup.css({top: position.y, left: position.x}).show();
         };
 
         /** Hide the Popup if there is no interaction or force to hide **/
         this.hide = function (force = false) {
             if (self.isHidden() || (!isTouch && _mouseIsAbove && !force)) return;
-            var timer = setTimeout(() => {
+            const timer = setTimeout(() => {
                 if (isTouch || !_mouseIsAbove || force) {
                     _cachedAnnotation = undefined;
                     _popup.hide();
@@ -334,27 +369,50 @@
     };
 
     /**
-     * Annotator 
-     * @param {jQuery} container 
+     * Annotator
+     * @param {jQuery} container
      * @param {Object} opts options
      * @param {function} fireEventFn Function used to fire events
      */
-    var Annotator = function (container, opts, fireEventFn) {
+    const Annotator = function (container, opts, fireEventFn) {
 
         /** Constructor **/
-        var _canvas = $('<canvas class="dda-canvas"></canvas>');
+        const _canvas = $('<canvas class="dda-canvas"></canvas>');
         container.append(_canvas);
 
-        var _popup = new Popup(this, container, opts);
-        var _hint = new Hint(container, opts);
+        const _popup = new Popup(this, container, opts);
+        const _hint = new Hint(container, opts);
 
-        var _annotations = [];
-        var _editAnnotationFn = undefined;
-        var _draggedAnnotation = undefined;
-        var _currentAnnotation = undefined;
-        var _ctx = _canvas[0].getContext("2d");
+        /**
+         * The annotations
+         * @type {Annotation[]}
+         * @private
+         */
+        let _annotations = [];
 
-        var self = this;
+        /**
+         *
+         * @type {(coordinate: {x: number, y: number}|undefined) => {new: Annotation, old_print: object}|undefined}
+         * @private
+         */
+        let _editAnnotationFn = undefined;
+
+        /**
+         * The dragged Annotation
+         * @type {Annotation|undefined}
+         * @private
+         */
+        let _draggedAnnotation = undefined;
+
+        /**
+         * Active annotation
+         * @type {Annotation|undefined}
+         * @private
+         */
+        let _currentAnnotation = undefined;
+        const _ctx = _canvas[0].getContext("2d");
+
+        const self = this;
         _canvas.droppable({
             drop: function (event, ui) {
                 _draggedAnnotation.geometry.update(_getUiCoordinate(ui.offset.left, ui.offset.top));
@@ -383,7 +441,7 @@
         });
 
         _canvas.mousemove(event => {
-            var coordinate = _toOriginalCoord(event.offsetX, event.offsetY);
+            const coordinate = _toOriginalCoord(event.offsetX, event.offsetY);
             fireEventFn(Events.MOUSE_MOVE_ANNOTATABLE_ITEM, printCoordinate(coordinate));
 
             if (_draggedAnnotation) {
@@ -398,17 +456,17 @@
                 return;
             }
 
-            var topAnnotation = _getAnnotationAt(coordinate);
-            if (topAnnotation.length == 0) {
-                _currentAnnotation = topAnnotation = undefined;
+            let topAnnotation = _getAnnotationAt(coordinate);
+            if (topAnnotation.length === 0) {
+                _currentAnnotation = undefined;
                 _canvas.css('cursor', 'default');
                 _popup.hide();
                 self.redrawAnnotations();
                 return;
             }
 
-            if (_popup.isHidden() || _currentAnnotation != topAnnotation[0]) {
-                if (_currentAnnotation != topAnnotation[0]) {
+            if (_popup.isHidden() || _currentAnnotation !== topAnnotation[0]) {
+                if (_currentAnnotation !== topAnnotation[0]) {
                     _currentAnnotation = topAnnotation[0];
                     if (_hint.show) _hint.show(opts["hint"]["iconMove"], opts["hint"]["messageMove"]);
                     _canvas.css('cursor', 'move');
@@ -418,9 +476,9 @@
             }
         });
 
-        _canvas.mouseup(event => {
+        _canvas.mouseup(() => {
             if (_editAnnotationFn) {
-                var edited = _editAnnotationFn();
+                const edited = _editAnnotationFn();
                 fireEventFn(Events.ANNOTATION_UPDATED, [edited.new.print(), edited.old_print]);
                 _editAnnotationFn = undefined;
             }
@@ -434,20 +492,27 @@
                 _canvas.trigger(event);
             }
 
-            if (!_currentAnnotation || _editAnnotationFn) return;
+            if (!_currentAnnotation || _editAnnotationFn) {
+                return;
+            }
 
-            if (!isTouch) _popup.hide(true);
+            if (!isTouch) {
+                _popup.hide(true);
+            }
 
-            var old_annotation = _currentAnnotation.print();
+            const old_annotation = _currentAnnotation.print();
 
-            var offsetOfCenter = _toOriginalCoord(event.offsetX, event.offsetY);
-            offsetOfCenter = { x: offsetOfCenter.x - _currentAnnotation.geometry.center.x, y: offsetOfCenter.y - _currentAnnotation.geometry.center.y };
+            let offsetOfCenter = _toOriginalCoord(event.offsetX, event.offsetY);
+            offsetOfCenter = {
+                x: offsetOfCenter.x - _currentAnnotation.geometry.center.x,
+                y: offsetOfCenter.y - _currentAnnotation.geometry.center.y
+            };
 
             _editAnnotationFn = function (coordinate) {
                 if (coordinate) {
-                    var newCoordinate = { x: coordinate.x - offsetOfCenter.x, y: coordinate.y - offsetOfCenter.y };
+                    const newCoordinate = {x: coordinate.x - offsetOfCenter.x, y: coordinate.y - offsetOfCenter.y};
 
-                    if (isTouch && newCoordinate.x != _currentAnnotation.geometry.center.x && newCoordinate.y != _currentAnnotation.geometry.center.y) {
+                    if (isTouch && newCoordinate.x !== _currentAnnotation.geometry.center.x && newCoordinate.y !== _currentAnnotation.geometry.center.y) {
                         _popup.hide();
                     }
 
@@ -457,48 +522,75 @@
                     });
                     self.redrawAnnotations(_currentAnnotation);
                 }
-                return { new: _currentAnnotation, old_print: old_annotation };
+                return {new: _currentAnnotation, old_print: old_annotation};
             };
         });
 
         /** Private method **/
 
-        /** Transform the resized coordinate to original coordinate **/
-        var _toOriginalCoord = function (x, y) {
-            return { x: parseInt((x / _canvas.width()) * _canvas[0].width), y: parseInt((y / _canvas.height()) * _canvas[0].height) };
+        /**
+         * Transform the resized coordinate to original coordinate
+         * @param {number} x
+         * @param {number} y
+         * @returns {{x: number, y: number}}
+         * @private
+         */
+        const _toOriginalCoord = function (x, y) {
+            return {
+                x: parseInt((x / _canvas.width()) * _canvas[0].width),
+                y: parseInt((y / _canvas.height()) * _canvas[0].height)
+            };
         };
 
         /** Transform the original coordinate to resized coordinate **/
-        var _fromOriginalCoord = function (x, y) {
-            return { x: parseInt((x * _canvas.width()) / _canvas[0].width), y: parseInt((y * _canvas.height()) / _canvas[0].height) };
+        const _fromOriginalCoord = function (x, y) {
+            return {
+                x: parseInt((x * _canvas.width()) / _canvas[0].width),
+                y: parseInt((y * _canvas.height()) / _canvas[0].height)
+            };
         };
 
-        /** Get the UI coordinate on drang & drop **/
-        var _getUiCoordinate = function (oLeft, oTop) {
+        /**
+         * Get the UI coordinate on drag & drop
+         * @param {number} oLeft
+         * @param {number} oTop
+         * @returns {{x: number, y: number}}
+         * @private
+         */
+        const _getUiCoordinate = function (oLeft, oTop) {
             return _toOriginalCoord((oLeft - _canvas.offset().left), (oTop - _canvas.offset().top));
         };
 
         /** Get the popup position from the current annotation **/
-        var _getPopupPosition = function () {
-            if (!_currentAnnotation) return;
-            var loverVertex = _currentAnnotation.geometry.getLowerVertex();
+        const _getPopupPosition = function () {
+            if (!_currentAnnotation) {
+                return;
+            }
+            const loverVertex = _currentAnnotation.geometry.getLowerVertex();
             return _fromOriginalCoord(loverVertex.x, loverVertex.y);
         }
 
-        /** Draw an annotation **/
-        var _drawAnnotation = function (annotation, highlight = false) {
-            var x = -annotation.geometry.width / 2, y = -annotation.geometry.height / 2;
+        /**
+         * Draw an annotation
+         * @param {Annotation} annotation
+         * @param {boolean} highlight
+         * @private
+         */
+        const _drawAnnotation = function (annotation, highlight = false) {
+            const x = -annotation.geometry.width / 2, y = -annotation.geometry.height / 2;
 
             _ctx.save();
             _ctx.beginPath();
 
             _ctx.translate(annotation.geometry.center.x, annotation.geometry.center.y);
-            _ctx.rotate(- annotation.geometry.rotation * Math.PI / 180);
+            _ctx.rotate(-annotation.geometry.rotation * Math.PI / 180);
 
-            if (annotation.image) _ctx.drawImage(annotation.image, x, y, annotation.geometry.width, annotation.geometry.height);
+            if (annotation.image) {
+                _ctx.drawImage(annotation.image, x, y, annotation.geometry.width, annotation.geometry.height);
+            }
 
             if (!annotation.image || opts["annotationStyle"]["imageBorder"]) {
-                var borderSize, borderColor;
+                let borderSize, borderColor;
                 if (highlight) {
                     borderColor = opts["annotationStyle"]["hiBorderColor"];
                     borderSize = opts["annotationStyle"]["hiBorderSize"];
@@ -530,11 +622,18 @@
             _ctx.restore();
         };
 
-        /** Returns the annotations that have the coordinate inside **/
-        var _getAnnotationAt = function (coordinate) {
-            var intersectedAnnotations = [];
+        /**
+         * Returns the annotations that have the coordinate inside
+         * @param {{x: number, y: number}} coordinate
+         * @returns {Annotation[]}
+         * @private
+         */
+        const _getAnnotationAt = function (coordinate) {
+            let intersectedAnnotations = [];
             _annotations.forEach(annotation => {
-                if (annotation.geometry.intersect(coordinate.x, coordinate.y)) intersectedAnnotations.push(annotation);
+                if (annotation.geometry.intersect(coordinate.x, coordinate.y)) {
+                    intersectedAnnotations.push(annotation);
+                }
             });
             intersectedAnnotations = intersectedAnnotations.reverse();
 
@@ -543,7 +642,11 @@
 
         /** Public method**/
 
-        /** Resize the Viewer **/
+        /**
+         * Resize the Viewer
+         * @param {number} width
+         * @param {number} height
+         */
         this.resize = function (width, height) {
             _canvas[0].width = width;
             _canvas[0].height = height;
@@ -554,12 +657,15 @@
             _ctx.clearRect(0, 0, _canvas[0].width, _canvas[0].height);
         };
 
-        /** Redraw the annotations **/
+        /**
+         * Redraw the annotations
+         * @param {Annotation|undefined} annotationToHighlight
+         */
         this.redrawAnnotations = function (annotationToHighlight = undefined) {
             self.clear();
-            var foregroundAnno = undefined;
+            let foregroundAnno = undefined;
             _annotations.forEach(annotation => {
-                var isEqual = (!annotationToHighlight) ? false : ((annotationToHighlight instanceof Object) ? (annotation == annotationToHighlight) : annotation.id === annotationToHighlight);
+                const isEqual = (!annotationToHighlight) ? false : ((annotationToHighlight instanceof Object) ? (annotation === annotationToHighlight) : annotation.id === annotationToHighlight);
                 if (isEqual && opts["annotationStyle"]["foreground"]) {
                     if (foregroundAnno) _drawAnnotation(foregroundAnno, true);
                     foregroundAnno = annotation;
@@ -567,7 +673,9 @@
                 }
                 _drawAnnotation(annotation, isEqual);
             });
-            if (foregroundAnno) _drawAnnotation(foregroundAnno, true);
+            if (foregroundAnno) {
+                _drawAnnotation(foregroundAnno, true);
+            }
         };
 
         /** Returns all annotations **/
@@ -578,7 +686,7 @@
         /** Add a new annotation  **/
         this.addAnnotation = function (annotation, annotationReplaced = undefined, fireEvent = true) {
             if (annotationReplaced) {
-                var index = _annotations.indexOf(annotationReplaced);
+                const index = _annotations.indexOf(annotationReplaced);
                 if (index > -1) {
                     _annotations[index] = annotation;
                     self.redrawAnnotations();
@@ -587,7 +695,7 @@
             }
 
             //push annotations sorted by decreasing area
-            var isLast = true;
+            let isLast = true;
             for (let index = 0; index < _annotations.length; index++) {
                 const element = _annotations[index];
                 if (element.geometry.area < annotation.geometry.area) {
@@ -602,19 +710,26 @@
             if (fireEvent) fireEventFn(Events.ANNOTATION_CREATED, [annotation.print()]);
         };
 
-        /** Rotate the annotation **/
+        /**
+         * Rotate the annotation
+         * @param {Annotation} annotation
+         */
         this.startRotateAnnotation = function (annotation) {
-            if (annotation.editable == AnnotationEdits.DISABLED) return;
+            if (annotation.editable === AnnotationEdits.DISABLED) {
+                return;
+            }
 
             _popup.hide(true);
-            if (_hint.show) _hint.show(opts["hint"]["iconRotate"], opts["hint"]["messageRotate"]);
+            if (_hint.show) {
+                _hint.show(opts["hint"]["iconRotate"], opts["hint"]["messageRotate"]);
+            }
             _canvas.css('cursor', 'default');
-            var old_annotation = annotation.print();
+            const old_annotation = annotation.print();
 
-            var startRotation;
+            let startRotation;
             _editAnnotationFn = function (coordinate) {
                 if (coordinate) {
-                    var rotation = Math.atan2(coordinate.y - annotation.geometry.center.y, coordinate.x - annotation.geometry.center.x) * 180 / Math.PI;
+                    const rotation = Math.atan2(coordinate.y - annotation.geometry.center.y, coordinate.x - annotation.geometry.center.x) * 180 / Math.PI;
                     annotation.geometry.update(
                         undefined,
                         annotation.geometry.rotation + (startRotation - rotation)
@@ -622,21 +737,32 @@
                     startRotation = rotation;
                     self.redrawAnnotations(annotation);
                 }
-                return { new: annotation, old_print: old_annotation };
+                return {new: annotation, old_print: old_annotation};
             };
         };
 
-        /** Remove the annotation **/
+        /**
+         * Remove the annotation
+         * @param {Annotation} annotation
+         * @param {boolean} fireEvent
+         */
         this.removeAnnotation = function (annotation, fireEvent = true) {
-            if (annotation.editable == AnnotationEdits.DISABLED) return;
+            if (annotation.editable === AnnotationEdits.DISABLED) {
+                return;
+            }
 
             _popup.hide(true);
             _annotations.splice(_annotations.indexOf(annotation), 1);
-            if (fireEvent) fireEventFn(Events.ANNOTATION_REMOVED, [annotation.print()]);
+            if (fireEvent) {
+                fireEventFn(Events.ANNOTATION_REMOVED, [annotation.print()]);
+            }
             self.redrawAnnotations();
         };
 
-        /** Remove all annotations **/
+        /**
+         * Remove all annotations
+         * @param {number|undefined} id
+         */
         this.removeAll = function (id = undefined) {
             if (id) {
                 _annotations = _annotations.filter(annotation => annotation.id !== id);
@@ -647,11 +773,18 @@
             self.clear();
         };
 
-        /** Edit the annotation text **/
+        /**
+         * Edit the annotation text
+         * @param {Annotation} annotation
+         * @param {string} newText
+         * @param {boolean} fireEvent
+         */
         this.editTextAnnotation = function (annotation, newText, fireEvent = true) {
-            if (annotation.editable != AnnotationEdits.FULL) return;
+            if (annotation.editable !== AnnotationEdits.FULL) {
+                return;
+            }
 
-            var old_print = annotation.print();
+            const old_print = annotation.print();
             annotation.text = newText;
             if (fireEvent) fireEventFn(Events.ANNOTATION_UPDATED, [annotation.print(), old_print]);
         };
@@ -661,29 +794,42 @@
 
     /**
      * Annotable
-     * @param {Image} image 
-     * @param {Object} opts options 
+     * @param {Image} image
+     * @param {Object} opts options
      */
-    var Annotable = function (image, opts) {
+    const Annotable = function (image, opts) {
 
         /** Constructor **/
         this.image = (image instanceof $) ? image : $(image);
-        if (!this.image[0] instanceof Image) $.error('Annotable it must be an image.');
+        if (!this.image[0] instanceof Image) {
+            $.error('Annotable it must be an image.');
+        }
         this.image.wrap($('<div class="dda-annotationlayer"></div>'));
 
-        var self = this;
-        var _annotator = new Annotator(this.image.parent(), opts, function (event, arg) {
+        const self = this;
+        const _annotator = new Annotator(this.image.parent(), opts, function (event, arg) {
             self.image.trigger(event, arg);
         });
 
-        if (this.image[0].complete) _annotator.resize(this.image[0].naturalWidth, this.image[0].naturalHeight);
-        else this.image[0].onload = function () { _annotator.resize(this.naturalWidth, this.naturalHeight); };
+        if (this.image[0].complete) {
+            _annotator.resize(this.image[0].naturalWidth, this.image[0].naturalHeight);
+        } else {
+            this.image[0].onload = function () {
+                _annotator.resize(this.naturalWidth, this.naturalHeight);
+            };
+        }
 
         /** Private method **/
 
-        /** Add the Annotation from Annotation Printed **/
-        var _addAnnotation = function (annotationPrinted, image, annotationReplaced) {
-            var replace = (annotationReplaced) ? _findAnnotation(annotationReplaced) : undefined;
+        /**
+         * Add the Annotation from Annotation Printed
+         * @param {object} annotationPrinted
+         * @param {HTMLImageElement|object} image
+         * @param {object} annotationReplaced
+         * @private
+         */
+        const _addAnnotation = function (annotationPrinted, image, annotationReplaced) {
+            const replace = (annotationReplaced) ? _findAnnotation(annotationReplaced) : undefined;
             _annotator.addAnnotation(new Annotation(
                 annotationPrinted["id"],
                 image, annotationPrinted["text"],
@@ -697,9 +843,14 @@
             ), replace, false);
         };
 
-        /** Find the Annotation from Annotation Printed**/
-        var _findAnnotation = function (annotationPrinted) {
-            var annotation = _annotator.getAnnotations().find(annotation => {
+        /**
+         * Find the Annotation from Annotation Printed
+         * @param {object} annotationPrinted
+         * @returns {Annotation}
+         * @private
+         */
+        const _findAnnotation = function (annotationPrinted) {
+            const annotation = _annotator.getAnnotations().find(annotation => {
                 return annotation.isEqualPrint(annotationPrinted);
             });
             if (!annotation) $.error("Annotation not found.");
@@ -708,7 +859,12 @@
 
         /** Public method **/
 
-        /** Adds a new annotation, or replaces an existing one. In the latter case, the parameter annotationReplaced is the annotation to replace **/
+        /**
+         * Adds a new annotation, or replaces an existing one.
+         * In the latter case, the parameter annotationReplaced is the annotation to replace
+         * @param {object} annotationPrinted
+         * @param {object|undefined} annotationReplaced
+         */
         this.addAnnotation = function (annotationPrinted, annotationReplaced = undefined) {
             if (!annotationPrinted["position"] ||
                 !annotationPrinted["position"]["center"] ||
@@ -719,29 +875,45 @@
             if (annotationPrinted["image"]) {
                 if (annotationPrinted["image"] instanceof Image) _addAnnotation(annotationPrinted, annotationPrinted["image"], annotationReplaced);
                 else {
-                    if (!annotationPrinted["image"] instanceof String || !annotationPrinted["image"].includes("http")) $.error('Image must be a URL or an instance of Image.');
-                    var image = new Image;
+                    if (!annotationPrinted["image"] instanceof String || !annotationPrinted["image"].includes("http")) {
+                        $.error('Image must be a URL or an instance of Image.');
+                    }
+                    const image = new Image();
                     image.src = annotationPrinted["image"];
-                    image.onload = function () { _addAnnotation(annotationPrinted, this, annotationReplaced); };
+                    image.onload = function () {
+                        _addAnnotation(annotationPrinted, this, annotationReplaced);
+                    };
                 }
-            } else _addAnnotation(annotationPrinted, {}, annotationReplaced);
+            } else {
+                _addAnnotation(annotationPrinted, {}, annotationReplaced);
+            }
         };
 
         /** Returns an array of annotations **/
         this.getAnnotations = function () {
-            var annotationsPrinted = [];
+            /**
+             * The current annotations
+             * @type {Annotation[]}
+             */
+            const annotationsPrinted = [];
             _annotator.getAnnotations().forEach(annotation => {
                 annotationsPrinted.push(annotation.print());
             });
             return annotationsPrinted;
         };
 
-        /** Removes an annotation **/
+        /**
+         * Removes an annotation
+         * @param {object} annotationPrinted
+         */
         this.removeAnnotation = function (annotationPrinted) {
             _annotator.removeAnnotation(_findAnnotation(annotationPrinted), false);
         };
 
-        /** Removes all annotations  **/
+        /**
+         * Removes all annotations
+         * @param {number|undefined} id
+         */
         this.removeAll = function (id = undefined) {
             _annotator.removeAll(id);
         };
@@ -756,7 +928,10 @@
             _annotator.redrawAnnotations();
         };
 
-        /** Highlights the specified annotation, just as if the mouse pointer was hovering over it **/
+        /**
+         * Highlights the specified annotation, just as if the mouse pointer was hovering over it
+         * @param {Annotation|object} annotationPrinted
+         */
         this.highlightAnnotation = function (annotationPrinted) {
             _annotator.redrawAnnotations(annotationPrinted instanceof Object ? _findAnnotation(annotationPrinted) : annotationPrinted);
         };
@@ -767,19 +942,21 @@
         }
     };
 
-    /** 
+    /**
      * Inizializer the annotable items
      */
     $.fn.annotable = function (methodOrOptions) {
+        let opts = {};
+        let instances = undefined;
         if (typeof methodOrOptions === 'object' || !methodOrOptions) {
-            var opts = $.extend(true, {}, $.fn.annotable.defaults, methodOrOptions);
-            var instances = (this.length > 1) ? [] : undefined;
+            opts = $.extend(true, {}, $.fn.annotable.defaults, methodOrOptions);
+            instances = (this.length > 1) ? [] : undefined;
 
             if (!$(opts["draggable"]).is(":ui-draggable")) {
                 $(opts["draggable"]).draggable({
                     helper: 'clone',
                     ghosting: true,
-                    cursorAt: { top: 0, left: 0 },
+                    cursorAt: {top: 0, left: 0},
                     revert: 'invalid',
                     start: function () {
                         touchStarted = true;
@@ -791,20 +968,22 @@
             }
         }
 
-        var args = Array.prototype.slice.call(arguments, 1);
+        const args = Array.prototype.slice.call(arguments, 1);
         this.each(function () {
-            var item = $(this), instance = item.data('annotable');
+            let item = $(this), instance = item.data('annotable');
             if (!instance) {
                 if (opts) {
                     instance = new Annotable(this, opts);
                     item.data('annotable', instance);
 
-                    if (!instances) instances = instance;
-                    else instances.push(instance);
+                    if (!instances) {
+                        instances = instance;
+                    } else {
+                        instances.push(instance);
+                    }
 
                 } else $.error('Annotable is not initialized.');
-            }
-            else if (typeof methodOrOptions === 'string' && instance[methodOrOptions]) {
+            } else if (typeof methodOrOptions === 'string' && instance[methodOrOptions]) {
                 return instance[methodOrOptions].apply(instance, args);
             } else $.error('Method ' + methodOrOptions + ' does not exist on Annotable');
         });

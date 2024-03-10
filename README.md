@@ -29,57 +29,63 @@ Are you looking for an image annotation toolkit (not drag and drop) written in J
 
 ## Dependencies
 
-* [jQuery](https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js) >= 1.8.2
-* [jQuery UI](https://code.jquery.com/ui/1.12.1/jquery-ui.min.js)
+* [jQuery](https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js) >= 1.8.2
+* [jQuery UI](https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js) >= 1.12.1
 * [Fontawesome](https://fontawesome.com/) (Optional - you can change the icons)
 
 ## Usage
 
 To set up **DragDropAnnotate** on a Web page, add this code to your page head:
 
-```
+```html
 <!-- jQuery -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js" crossorigin="anonymous"></script>
 
 <!-- Fontawesome -->
-<link rel="stylesheet" href="./vendor/fontawesome-free-5.12.1-web/css/all.min.css" type="text/css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" type="text/css" />
 
 <!-- DragDropAnnotate -->
-<link rel="stylesheet" href="./src/dragDropAnnotate.css" type="text/css" />
-<script src="./src/dragDropAnnotate.js"></script>
+<link rel="stylesheet" href="./src/dragDropAnnotate.min.css" type="text/css" />
+<script src="./src/dragDropAnnotate.min.js"></script>
 
 ```
 
 ## Initialize annotable item (droppable)
 
-```
+```html
 <img id="imageExample" src="example.jpg">
 ```
 
 In its simplest case, **DragDropAnnotate** can be initialised with a single line of Javascript:
 
-```
+```javascript
 var annotable = $("#imageExample").annotable();   
 ```
 
 Or use optional configuration parameters:
 
-```
+```javascript
 var annotable = $("#imageExample").annotable({
     draggable: ".annotation",
     ... // other optional settings 
 });    
 ```
 
-If use class selector, the annotable variable is an array.
+If you use class selector, the annotable variable is an array.
 
 #### Optional configuration parameters 
 
-All properties are **OPTIONAL** and they merge with the default.
+All properties are **OPTIONAL**, and they merge with the default.
 
-```
-/* COMPLETE and DEFAULT VALUES */ 
+```javascript
+/* COMPLETE and DEFAULT VALUES */
+const MetadataValue = {
+  ID: 'id', //Print id of annotation if exists,
+  TEXT: "text", //Print the annotation text
+  TIMESTAMP: "timestamp", //Print the annotation creation date
+  PROGRESSIVE: "progressive" //Print the progressive counter insertion of annotations
+}
 
 var options = {
     draggable: ".draggable-annotation", //draggable annotations
@@ -87,17 +93,17 @@ var options = {
     hint: { //hint settings
         enabled: true, //if false, not show the hint
         message: "Drag and Drop to Annotate", //hint message
-        icon: '<i class="far fa-question-circle"></i>', //hint icon        
+        icon: '<i class="fa-regular fa-circle-question"></i>', //hint icon        
         messageMove: "Drag to set new annotation position", //message on mouseover annotation
-        iconMove: '<i class="fas fa-info"></i>',  //icon on mouseover annotation
+        iconMove: '<i class="fa-solid fa-info"></i>',  //icon on mouseover annotation
         messageRotate: "Move to set new annotation rotation",  //message on start rotate annotation
-        iconRotate: '<i class="fas fa-info"></i>',  //icon on start rotate annotation
+        iconRotate: '<i class="fa-solid fa-info"></i>',  //icon on start rotate annotation
     },
 
     popup: { //popup settings        
-        buttonRotate: '<i class="fas fa-sync-alt"></i>', //icon or text of rotate button 
+        buttonRotate: '<i class="fa-solid fa-rotate"></i>', //icon or text of rotate button 
         tooltipRotate: "Change the rotation of annotation", //tooltip of rotate button 
-        buttonRemove: '<i class="fas fa-trash"></i>', //icon or text of remove button 
+        buttonRemove: '<i class="fa-solid fa-trash"></i>', //icon or text of remove button 
         tooltipRemove: "Remove the annotation", //tooltip of remove button 
         tooltipText: "Text of annotation", //tooltip of annotation text
         tooltipTextarea: "Text of annotation", //tooltip of annotation textarea input
@@ -111,31 +117,76 @@ var options = {
         hiBorderSize: 2.2,  //border width for highlighted annotation  [1-12]    
         imageBorder: true, //if false, not show the border on annotation with image
         foreground: true //if false, not brings the annotation to the foreground when the mouseover
+    },
+    
+    metadata: { //metadata settings
+        enabled: false, //if true, show the metadata
+        value: MetadataValue.PROGRESSIVE, //the metadata to show [MetadataValue | (annotation) => string]
+        fontSize: "40px", //the font size of text
+        fontFamily: "sans-serif", //the font family of text
+        color: "#ff0000", //the color of text
+        position: "bottom-right", //the position of text ["y-x"] -> y: ["top"|"middle"|"bottom"], x: ["left"|"center"|"right"]
+        offsetX: -20, //the offset from x
+        offsetY: -10 //the offset from y
     }
 };
+```
+
+#### Show metadata value
+
+For each annotation you can show a text that can have the following values:
+- `id`: Print id of annotation if exists
+- `text`: Print the annotation text
+- `timestamp`: Print the annotation creation date
+- `progressive`: Print the progressive counter insertion of annotations
+- **function**: You can pass a function that takes 'annotation' as a variable and returns the string you want to print (`(annotation) => string`)
+
+**Examples**
+
+```javascript
+var annotable = $("#imageExample").annotable({
+  draggable: ".annotation",
+  metadata: {
+    enabled: true,
+    value: "id"
+  }
+});
+
+// or 
+
+var annotable = $("#imageExample").annotable({
+    draggable: ".annotation",
+    metadata: {
+      enabled: true,
+      value: (annotation) => {
+        return `My custom string ${annotation.id}`;
+      },
+      position: "middle-center"
+    }
+});    
 ```
 
 ## Initialize annotation item (draggable)
 
 - Annotation with image
-    ```
+    ```html
     <img class="draggable-annotation" src="example.jpg" annotation-text="example" />
     ```
 - Simple Annotation
-    ```
+    ```html
     <div class="draggable-annotation" annotation-text="example" annotation-width="200" annotation-height="400"> Example </div>
     ```
 
 #### Configuration attributes 
 
-| Attribute | Default | Description |
-| --------- | :---------: | --------- |
-| annotation-id | `undefined` | Id of annotation. |
-| annotation-text | `undefined` | Text of annotation, is shown on mouseover. |
-| annotation-width | `50` | Width of annotation expressed in pixels (px).<br />If use Annotation with image, the default value is `naturalWidth` of image. |
-| annotation-height | `50` | Height of annotation expressed in pixels (px).<br />If use Annotation with image, the default value is `naturalHeight` of image. |
-| annotation-rotation | `0` | Rotation of the annotation with respect to the x-axis, expressed in degrees. |
-| annotation-editable | `"noText"` | `"disabled"`: the annotation is not editable.<br />`"noText"`: the annotation can be rotated, moved and deleted.<br />`"full"`: the annotation can be edited (text), rotated, moved and deleted. |
+| Attribute           |   Default   | Description                                                                                                                                                                                      |
+|---------------------|:-----------:|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| annotation-id       | `undefined` | Id of annotation.                                                                                                                                                                                |
+| annotation-text     | `undefined` | Text of annotation, is shown on mouseover.                                                                                                                                                       |
+| annotation-width    |    `50`     | Width of annotation expressed in pixels (px).<br />If use Annotation with image, the default value is `naturalWidth` of image.                                                                   |
+| annotation-height   |    `50`     | Height of annotation expressed in pixels (px).<br />If use Annotation with image, the default value is `naturalHeight` of image.                                                                 |
+| annotation-rotation |     `0`     | Rotation of the annotation with respect to the x-axis, expressed in degrees.                                                                                                                     |
+| annotation-editable | `"noText"`  | `"disabled"`: the annotation is not editable.<br />`"noText"`: the annotation can be rotated, moved and deleted.<br />`"full"`: the annotation can be edited (text), rotated, moved and deleted. |
 
 Pixels of annotation are relative to natural size of annotable element.
 
@@ -144,22 +195,22 @@ Pixels of annotation are relative to natural size of annotable element.
 You can use API methods using:
 
 - Annotable variable
-    ```
+    ```javascript
     var annotable = $("#imageExample").annotable(); //Initialize
     annotable.method();    
 
-        or 
+    // or 
 
     var annotables = $(".imagesExample").annotable(); //Initialize
     annotables[0].method();  // Use method at first element 
     ```
 - jQuery selector 
     
-    ```
+    ```javascript
     $("#imageExample").annotable(); //Initialize
     $("#imageExample").method();    
 
-        or 
+    // or 
 
     $(".imagesExample").annotable(); //Initialize
     $(".imagesExample").method();  // Use method at all elements
@@ -172,7 +223,7 @@ Adds a new custom annotation, or replaces an existing one. In the latter case, t
 
 Custom annotations are object, according to the following example:
 
-```
+```javascript
 var myAnnotation = {
     /** Id of annotation. [OPTIONAL] **/
     id: "1", 
@@ -250,12 +301,12 @@ Adds an event handler function. You can register for the following events:
 
 Example:
 
-``` 
+```javascript
 annotable.on('onAnnotationCreated', function (event, annotation) {
     console.log(annotation);
 });
 
-    or 
+// or 
 
 $("#imageExample").on('onAnnotationCreated', function (event, annotation) {
     console.log(annotation);

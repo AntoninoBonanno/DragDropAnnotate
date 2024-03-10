@@ -2,139 +2,157 @@
 <html lang="en">
 
 <head>
-  <title>DragDrop Annotate</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="./index.css" type="text/css" />
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" type="text/css" />
+    <title>DragDrop Annotate</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./index.css" type="text/css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+          type="text/css"/>
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js" crossorigin="anonymous"></script>
 
-  <link rel="stylesheet" href="../src/dragDropAnnotate.min.css" type="text/css" />
-  <script src="../src/dragDropAnnotate.min.js"></script>
+    <link rel="stylesheet" href="../src/dragDropAnnotate.min.css" type="text/css"/>
+    <script src="../src/dragDropAnnotate.min.js"></script>
 
-  <script>
-    var anno;
+    <script>
+        var anno;
 
-    $(document).ready(function () {
+        $(document).ready(function () {
 
-      anno = $("#imageExample").annotable({
-        draggable: ".annotation"
-      });
+            anno = $("#imageExample").annotable({
+                draggable: ".annotation"
+            });
 
-      $(".annotation").mouseover(function () {
-        anno.highlightAnnotation($(this).attr("annotation-id"));
-      });
+            $(".annotation").mouseover(function () {
+                anno.highlightAnnotation($(this).attr("annotation-id"));
+            });
 
-      anno.on('onMouseMoveOverItem', function (event, coordinate) {
-        $('#showPixel').html("[x: " + coordinate.x + " - y: " + coordinate.y + "]");
-      });
+            anno.on('onMouseMoveOverItem', function (event, coordinate) {
+                $('#showPixel').html("[x: " + coordinate.x + " - y: " + coordinate.y + "]");
+            });
 
-      anno.on('onAnnotationCreated', function (event, annotation) {
-        console.log(annotation);
-      });
+            anno.on('onAnnotationCreated', function (event, annotation) {
+                console.log(annotation);
+            });
 
-      anno.on('onAnnotationUpdated', function (event, annotation) {
-        console.log(annotation);
-      });
+            anno.on('onAnnotationUpdated', function (event, annotation) {
+                console.log(annotation);
+            });
 
-      anno.on('onAnnotationRemoved', function (event, annotation) {
-        console.log(annotation);
-      });
+            anno.on('onAnnotationRemoved', function (event, annotation) {
+                console.log(annotation);
+            });
 
-      var myAnnotation = {
-        id: 3,
-        text: "customAnnotation",
-        position: {
-          center: { x: 593, y: 353 }
-        },
-        width: 250,
-        height: 400
-      };
-      anno.addAnnotation(myAnnotation);
+            var myAnnotation = {
+                id: 3,
+                text: "customAnnotation",
+                position: {
+                    center: {x: 593, y: 353}
+                },
+                width: 250,
+                height: 400
+            };
+            anno.addAnnotation(myAnnotation);
 
-      var annos = $(".annotableImage").annotable({ //return array of annotable
-        draggable: ".annotation",
-        annotationStyle: { //annotation style 
-          hiBorderColor: 'red', // border color for highlighted annotation  
-          hiBorderSize: 3.2,  //border width for highlighted annotation  [1-12]    
-          imageBorder: false, //if false, not show the border on annotation 
-        }
-      });
+            var annos = $(".annotableImage").annotable({ //return array of annotable
+                draggable: ".annotation",
+                annotationStyle: { //annotation style
+                    hiBorderColor: 'red', // border color for highlighted annotation
+                    hiBorderSize: 3.2,  //border width for highlighted annotation  [1-12]
+                    imageBorder: false, //if false, not show the border on annotation
+                }
+            });
 
-      $(".annotableImage").on('onAnnotationCreated', function (event, annotation) {
-        console.log(annotation);
-      });
-    });
+            $(".annotableImage").on('onAnnotationCreated', function (event, annotation) {
+                console.log(annotation);
+            });
+        });
 
-  </script>
+    </script>
 </head>
 
 <body>
 
-  <div class="sidenav">
+<div class="sidenav">
     <h3>Annotations</h3>
-    <h5><i class="fas fa-feather-alt"></i> Drag and Drop an annotation to Annotate</h5>
+    <h5><i class="fa-solid fa-feather-pointed"></i> Drag and Drop an annotation to Annotate</h5>
+
     <div class="annotation" annotation-text="A Dog" annotation-width="150"
-      annotation-height="150" annotation-id="1">1 - Dog</div>
-    <div class="annotation" annotation-text="A Cat" annotation-width="600" annotation-height="500" annotation-id="2">2 -
-      Cat</div>
+         annotation-height="150" annotation-id="1">
+        1 - Dog
+    </div>
+    <div class="annotation" annotation-text="A Cat" annotation-width="600" annotation-height="500" annotation-id="2">
+        2 - Cat
+    </div>
     <div class="annotation" annotation-editable="full" annotation-text="Full Edit Text" annotation-width="150"
-      annotation-height="150" annotation-id="3">3 - Full Edit</div>
-    <div class="annotation" annotation-editable="disabled" annotation-text="Disabled annotation" annotation-width="300" annotation-height="100" annotation-id="4">4 -
-      Disabled Edit</div>
+         annotation-height="150" annotation-id="3">
+        3 - Full Edit
+    </div>
+    <div class="annotation" annotation-editable="disabled" annotation-text="Disabled annotation" annotation-width="300"
+         annotation-height="100" annotation-id="4">
+        4 - Disabled Edit
+    </div>
 
     <h3>Image Annotations</h3>
-    <img class="annotation" src="./imageAnnotations/Dalmatiner.jpg" annotation-text="Dog" style="height:100px" />
-    <img class="annotation" src="./imageAnnotations/BluEye.jpg" annotation-text="Blue eye" style="height:100px" />
-    <img class="annotation" src="./imageAnnotations/YellowEye.jpg" annotation-text="Yellow eye" style="height:100px" />
+    <img class="annotation" src="./imageAnnotations/Dalmatiner.jpg" annotation-text="Dog" style="height:100px"
+         alt="dog"/>
+    <img class="annotation" src="./imageAnnotations/BluEye.jpg" annotation-text="Blue eye" style="height:100px"
+         alt="blue-eye"/>
+    <img class="annotation" src="./imageAnnotations/YellowEye.jpg" annotation-text="Yellow eye" style="height:100px"
+         alt="yellow-eye"/>
 
-    <a href="https://github.com/AntoninoBonanno/DragDropAnnotate"><i class="fab fa-github"></i> View on
-      GitHub</a>
-  </div>
+    <a href="https://github.com/AntoninoBonanno/DragDropAnnotate">
+        <i class="fa-brands fa-github"></i> View on GitHub
+    </a>
+</div>
 
 
-  <div class="main">
-    <h1><i class="fas fa-feather-alt"></i> DragDrop Annotate</h1>
+<div class="main">
+    <h1><i class="fa-solid fa-feather-pointed"></i> DragDrop Annotate</h1>
     <h2>Plugin Examples</h2>
-    <div id="gitLink"><i class="fab fa-github"></i> <a href="https://github.com/AntoninoBonanno/DragDropAnnotate">View
-        on GitHub</a>
+    <div id="gitLink">
+        <i class="fa-brands fa-github"></i> <a href="https://github.com/AntoninoBonanno/DragDropAnnotate">
+        View on GitHub
+    </a>
     </div>
 
     <h2 style="margin-top: 60px;">Test Images</h2>
     <div>
-      <button onclick="anno.removeAll('1')">Remove Id 1</button>
-      <button onclick="anno.removeAll()">Remove all annotations</button>
-      <button onclick="anno.hideAnnotations()">Hide annotations</button>
-      <button onclick="anno.showAnnotations()">Show annotations</button>
+        <button onclick="anno.removeAll('1')">Remove Id 1</button>
+        <button onclick="anno.removeAll()">Remove all annotations</button>
+        <button onclick="anno.hideAnnotations()">Hide annotations</button>
+        <button onclick="anno.showAnnotations()">Show annotations</button>
 
-      <div style="margin-top: 50px;" id="showPixel">[x: 0 - y: 0]</div>
-      <img id="imageExample" src="784px-Dalmatiner_schw_braun.jpg" width="505">
-      <p class="image-caption">
-        Die verschiedenen Farben eines Dalmatiners Public Domain. Source:
-        <a href="https://commons.wikimedia.org/wiki/File:Dalmatiner_schw_braun.jpg">Wikimedia
-          Commons</a>
-      </p>
+        <div style="margin-top: 50px;" id="showPixel">[x: 0 - y: 0]</div>
+        <img id="imageExample" src="784px-Dalmatiner_schw_braun.jpg" width="505" alt="image-example-1"/>
+        <p class="image-caption">
+            Die verschiedenen Farben eines Dalmatiners Public Domain. Source:
+            <a href="https://commons.wikimedia.org/wiki/File:Dalmatiner_schw_braun.jpg">
+                Wikimedia Commons
+            </a>
+        </p>
     </div>
 
     <div style="margin-top: 100px;">
-      <img class="annotableImage" src="800px-Cat_and_Dog_Game.jpg">
-      <p class="image-caption">
-        Cat about to play with the dog and his guarded balls. Public Domain. Source:
-        <a href="https://commons.wikimedia.org/wiki/File:Cat_and_Dog_Game.jpg">Wikimedia
-          Commons</a>
-      </p>
+        <img class="annotableImage" src="800px-Cat_and_Dog_Game.jpg" alt="image-example-2"/>
+        <p class="image-caption">
+            Cat about to play with the dog and his guarded balls. Public Domain. Source:
+            <a href="https://commons.wikimedia.org/wiki/File:Cat_and_Dog_Game.jpg">
+                Wikimedia Commons
+            </a>
+        </p>
     </div>
 
     <div style="margin-top: 100px;">
-      <img class="annotableImage" src="712px-June_odd-eyed-cat_cropped.jpg">
-      <p class="image-caption">
-        A white cat with a one yellow eye and one blue eye. Public Domain. Source:
-        <a href="https://commons.wikimedia.org/wiki/File:June_odd-eyed-cat_cropped.jpg">Wikimedia
-          Commons</a>
-      </p>
+        <img class="annotableImage" src="712px-June_odd-eyed-cat_cropped.jpg" alt="image-example-3"/>
+        <p class="image-caption">
+            A white cat with a one yellow eye and one blue eye. Public Domain. Source:
+            <a href="https://commons.wikimedia.org/wiki/File:June_odd-eyed-cat_cropped.jpg">
+                Wikimedia Commons
+            </a>
+        </p>
     </div>
-  </div>
+</div>
 </body>
 
 </html>

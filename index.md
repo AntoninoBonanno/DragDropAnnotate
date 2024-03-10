@@ -26,36 +26,39 @@ Supports rectangle, and image annotations. The drag and drop functionality based
 ## Instructions
 
 ### Imports
-```
+```html
 <!-- jQuery -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js" crossorigin="anonymous"></script>
 
 <!-- Fontawesome -->
-<link rel="stylesheet" href="./vendor/fontawesome-free-5.12.1-web/css/all.min.css" type="text/css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" type="text/css" />
 
 <!-- DragDropAnnotate -->
-<link rel="stylesheet" href="./src/dragDropAnnotate.css" type="text/css" />
-<script src="./src/dragDropAnnotate.js"></script>
+<link rel="stylesheet" href="./src/dragDropAnnotate.min.css" type="text/css" />
+<script src="./src/dragDropAnnotate.min.js"></script>
 ```
 
 ### Initialize annotable item (droppable)
 
-```
+```html
 <img id="imageExample" src="example.jpg">
-var annotable = $("#imageExample").annotable();  
+
+<script>
+    var annotable = $("#imageExample").annotable();
+</script>
 ```
 ### Initialize annotation item (draggable)
 
 Annotation with image
 
-```
+```html
 <img class="draggable-annotation" src="example.jpg" annotation-text="example" />
 ```
 
 Simple Annotation
 
-```
+```html
 <div class="draggable-annotation" annotation-text="example" annotation-width="200" annotation-height="400"> Example </div>
 ```
 

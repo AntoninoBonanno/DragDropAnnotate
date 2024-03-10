@@ -29,8 +29,8 @@ Are you looking for an image annotation toolkit (not drag and drop) written in J
 
 ## Dependencies
 
-* [jQuery](https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js) >= 1.8.2
-* [jQuery UI](https://code.jquery.com/ui/1.12.1/jquery-ui.min.js)
+* [jQuery](https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js) >= 1.8.2
+* [jQuery UI](https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js) >= 1.12.1
 * [Fontawesome](https://fontawesome.com/) (Optional - you can change the icons)
 
 ## Usage
@@ -39,11 +39,11 @@ To set up **DragDropAnnotate** on a Web page, add this code to your page head:
 
 ```html
 <!-- jQuery -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js" crossorigin="anonymous"></script>
 
 <!-- Fontawesome -->
-<link rel="stylesheet" href="./vendor/fontawesome-free-5.12.1-web/css/all.min.css" type="text/css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" type="text/css" />
 
 <!-- DragDropAnnotate -->
 <link rel="stylesheet" href="./src/dragDropAnnotate.min.css" type="text/css" />
@@ -93,17 +93,17 @@ var options = {
     hint: { //hint settings
         enabled: true, //if false, not show the hint
         message: "Drag and Drop to Annotate", //hint message
-        icon: '<i class="far fa-question-circle"></i>', //hint icon        
+        icon: '<i class="fa-regular fa-circle-question"></i>', //hint icon        
         messageMove: "Drag to set new annotation position", //message on mouseover annotation
-        iconMove: '<i class="fas fa-info"></i>',  //icon on mouseover annotation
+        iconMove: '<i class="fa-solid fa-info"></i>',  //icon on mouseover annotation
         messageRotate: "Move to set new annotation rotation",  //message on start rotate annotation
-        iconRotate: '<i class="fas fa-info"></i>',  //icon on start rotate annotation
+        iconRotate: '<i class="fa-solid fa-info"></i>',  //icon on start rotate annotation
     },
 
     popup: { //popup settings        
-        buttonRotate: '<i class="fas fa-sync-alt"></i>', //icon or text of rotate button 
+        buttonRotate: '<i class="fa-solid fa-rotate"></i>', //icon or text of rotate button 
         tooltipRotate: "Change the rotation of annotation", //tooltip of rotate button 
-        buttonRemove: '<i class="fas fa-trash"></i>', //icon or text of remove button 
+        buttonRemove: '<i class="fa-solid fa-trash"></i>', //icon or text of remove button 
         tooltipRemove: "Remove the annotation", //tooltip of remove button 
         tooltipText: "Text of annotation", //tooltip of annotation text
         tooltipTextarea: "Text of annotation", //tooltip of annotation textarea input

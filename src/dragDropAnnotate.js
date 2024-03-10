@@ -1121,16 +1121,16 @@ import "./dragDropAnnotate.scss";
         "hint": { //hint settings
             "enabled": true, //if false, not show the hint
             "message": "Drag and Drop to Annotate", //hint message
-            "icon": '<i class="far fa-question-circle"></i>', //hint icon
+            "icon": '<i class="fa-regular fa-circle-question"></i>', //hint icon
             "messageMove": "Drag to set new annotation position", //message on mouseover annotation
-            "iconMove": '<i class="fas fa-info"></i>',  //icon on mouseover annotation
+            "iconMove": '<i class="fa-solid fa-info"></i>',  //icon on mouseover annotation
             "messageRotate": "Move to set new annotation rotation",  //message on start rotate annotation
-            "iconRotate": '<i class="fas fa-info"></i>',  //icon on start rotate annotation
+            "iconRotate": '<i class="fa-solid fa-info"></i>',  //icon on start rotate annotation
         },
         "popup": { //popup settings
-            "buttonRotate": '<i class="fas fa-sync-alt"></i>', //icon or text of rotate button 
+            "buttonRotate": '<i class="fa-solid fa-rotate"></i>', //icon or text of rotate button
             "tooltipRotate": "Change the rotation of annotation", //tooltip of rotate button 
-            "buttonRemove": '<i class="fas fa-trash"></i>', //icon or text of remove button 
+            "buttonRemove": '<i class="fa-solid fa-trash"></i>', //icon or text of remove button
             "tooltipRemove": "Remove the annotation", //tooltip of remove button 
             "tooltipText": "Text of annotation", //tooltip of annotation text 
             "tooltipTextarea": "Text of annotation", //tooltip of annotation textarea input

@@ -1,0 +1,212 @@
+$red: #e74a3b;
+$orange: #f6c23e;
+$white: #fff;
+$black: #000;
+$blackGray: #111;
+$gray: #ccc;
+$popupColor: #ededed;
+
+.ui-draggable {
+  opacity: 0.8;
+  cursor: all-scroll;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.dda-annotationlayer {
+  position: relative;
+  display: inline-block;
+
+  .dda-canvas {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 0;
+    opacity: 0.6;
+  }
+
+  .dda-popup {
+    position: absolute;
+    z-index: 1;
+    line-height: 135%;
+    font-family: Arial, Verdana, Sans, serif;
+    font-style: italic;
+    font-size: 12px;
+    color: $black;
+    background-color: $white;
+    border: 1px solid $gray;
+    word-wrap: break-word;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -khtml-border-radius: 3px;
+    -moz-box-shadow: 0px 5px 15px $blackGray;
+    -webkit-box-shadow: 0px 5px 15px $blackGray;
+    box-shadow: 0px 5px 15px $blackGray;
+
+    -moz-transition-property: opacity;
+    -moz-transition-duration: 0.5s;
+    -moz-transition-delay: 0s;
+    -webkit-transition-property: opacity;
+    -webkit-transition-duration: 0.5s;
+    -webkit-transition-delay: 0s;
+    -o-transition-property: opacity;
+    -o-transition-duration: 0.5s;
+    -o-transition-delay: 0s;
+    transition-property: opacity;
+    transition-duration: 0.5s;
+    transition-delay: 0s;
+  }
+
+  .dda-popup-text {
+    float: left;
+    margin: 7px 8px 4px 8px;
+    flex: auto;
+    cursor: default;
+    min-width: 30px;
+    text-align: left;
+  }
+
+  .dda-popup-textarea {
+    float: left;
+    margin: 7px 8px 4px 8px;
+    cursor: default;
+    border: 1px solid $popupColor;
+  }
+
+  .dda-popup-buttons {
+    float: right;
+    display: -webkit-inline-box;
+    display: -ms-inline-flexbox;
+    -moz-transition-property: opacity;
+    -moz-transition-duration: 1s;
+    -moz-transition-delay: 0s;
+    -webkit-transition-property: opacity;
+    -webkit-transition-duration: 1s;
+    -webkit-transition-delay: 0s;
+    -o-transition-property: opacity;
+    -o-transition-duration: 1s;
+    -o-transition-delay: 0s;
+    transition-property: opacity;
+    transition-duration: 1s;
+    transition-delay: 0s;
+
+    button {
+      font-weight: bold;
+      opacity: 0.8;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      display: block;
+      cursor: pointer;
+
+      text-align: center;
+      user-select: none;
+      background-color: transparent;
+      border: none;
+      border-radius: 2px;
+      text-transform: none;
+
+      -moz-transition-property: opacity;
+      -moz-transition-duration: 0.5s;
+      -moz-transition-delay: 0s;
+      -webkit-transition-property: opacity;
+      -webkit-transition-duration: 0.5s;
+      -webkit-transition-delay: 0s;
+      -o-transition-property: opacity;
+      -o-transition-duration: 0.5s;
+      -o-transition-delay: 0s;
+      transition-property: opacity;
+      transition-duration: 0.5s;
+      transition-delay: 0s;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+
+    .dda-popup-button-remove {
+      color: $red;
+    }
+
+    .dda-popup-button-rotate {
+      color: $orange;
+    }
+
+    @media (focus: focus) and (pointer: coarse) {
+      .dda-popup-button-remove:focus {
+        outline: none !important;
+        border: 1px solid $red;
+      }
+
+      .dda-popup-button-rotate:focus {
+        outline: none !important;
+        border: 1px solid $orange;
+      }
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .dda-popup-button-remove:hover {
+        color: $white;
+        background-color: $red;
+      }
+      .dda-popup-button-rotate:hover {
+        color: $white;
+        background-color: $orange;
+      }
+    }
+  }
+
+  .dda-hint {
+    white-space: nowrap;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    pointer-events: none;
+    opacity: 0.8;
+
+    .dda-hint-msg {
+      pointer-events: auto;
+
+      background-color: rgba(0, 0, 0, 0.2);
+      margin: 4px;
+      padding: 8px 15px 8px 30px;
+      font-family: 'lucida grande', tahoma, verdana, arial, sans-serif;
+      line-height: normal;
+      font-size: 12px;
+      color: $white;
+      border-radius: 4px;
+      -moz-border-radius: 4px;
+      -webkit-border-radius: 4px;
+      -khtml-border-radius: 4px;
+
+      -moz-transition-property: opacity;
+      -moz-transition-duration: .5s;
+      -moz-transition-delay: 0s;
+      -webkit-transition-property: opacity;
+      -webkit-transition-duration: .5s;
+      -webkit-transition-delay: 0s;
+      -o-transition-property: opacity;
+      -o-transition-duration: .5s;
+      -o-transition-delay: 0s;
+      transition-property: opacity;
+      transition-duration: .5s;
+      transition-delay: 0s;
+    }
+
+    .dda-hint-icon {
+      pointer-events: auto;
+      position: absolute;
+      top: 6px;
+      left: 5px;
+      width: 19px;
+      height: 22px;
+      margin: 2px 4px 0 6px;
+      color: $white;
+    }
+  }
+}

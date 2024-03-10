@@ -21,6 +21,8 @@
     "husky": "^9.0.11",
     "is-ci": "^3.0.1",
     "mini-css-extract-plugin": "^2.8.1",
+    "sass": "^1.71.1",
+    "sass-loader": "^14.1.1",
     "terser": "^5.28.1",
     "terser-webpack-plugin": "^5.3.10",
     "uglify-js": "^3.17.4",

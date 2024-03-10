@@ -1,4 +1,4 @@
-import "./dragDropAnnotate.css";
+import "./dragDropAnnotate.scss";
 
 "use strict";
 

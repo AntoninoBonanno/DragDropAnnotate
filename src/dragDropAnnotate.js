@@ -29,6 +29,13 @@ import "./dragDropAnnotate.scss";
         FULL: 'full' //The annotation can be edited
     };
 
+    const MetadataValue = {
+        ID: 'id', //Print id of annotation if exists,
+        TEXT: "text", //Print the annotation text
+        TIMESTAMP: "timestamp", //Print the annotation creation date
+        PROGRESSIVE: "progressive" //Print the progressive counter insertion of annotations
+    }
+
     /**
      * Check if touch drag started
      */
@@ -191,8 +198,9 @@ import "./dragDropAnnotate.scss";
      * @param {string} text Text of annotation
      * @param {Geometry} geometry Geometry of annotation
      * @param {string} editable Behavior of the annotation for editing
+     * @param {number|undefined} progressive The progressive number of Annotation
      */
-    const Annotation = function (id, image, text, geometry, editable = AnnotationEdits.NO_TEXT) {
+    const Annotation = function (id, image, text, geometry, editable = AnnotationEdits.NO_TEXT, progressive = undefined) {
         this.id = id;
         this.text = text;
         if (image instanceof Image) {
@@ -200,6 +208,7 @@ import "./dragDropAnnotate.scss";
         }
         this.geometry = geometry;
         this.editable = editable;
+        this.progressive = progressive;
         this.created_at = Date.now();
 
         const self = this;
@@ -207,6 +216,7 @@ import "./dragDropAnnotate.scss";
         this.print = function () {
             return {
                 "id": self.id,
+                "progressive": self.progressive,
                 "image": (self.image) ? self.image.src : undefined,
                 "text": self.text,
                 ...self.geometry.print(),
@@ -393,8 +403,15 @@ import "./dragDropAnnotate.scss";
         let _annotations = [];
 
         /**
+         * The progressive insertion of annotations counts
+         * @type {number}
+         * @private
+         */
+        let _progressiveCounter = 0;
+
+        /**
          *
-         * @type {(coordinate: {x: number, y: number}|undefined) => {new: Annotation, old_print: object}|undefined}
+         * @type {(coordinate?: {x: number, y: number}|undefined) => {new: Annotation, old_print: object}|undefined}
          * @private
          */
         let _editAnnotationFn = undefined;
@@ -412,7 +429,22 @@ import "./dragDropAnnotate.scss";
          * @private
          */
         let _currentAnnotation = undefined;
+
+        /**
+         * The canvas
+         * @type CanvasRenderingContext2D | null
+         * @private
+         */
         const _ctx = _canvas[0].getContext("2d");
+
+        /**
+         * The position of metadata text [y, x]
+         * @private
+         */
+        let _metaPositionArray = opts["metadata"]["position"].split('-');
+        if (_metaPositionArray.length !== 2) {
+            _metaPositionArray = ['bottom', 'right']
+        }
 
         const self = this;
         _canvas.droppable({
@@ -432,7 +464,8 @@ import "./dragDropAnnotate.scss";
                         ui.draggable.attr("annotation-height") || ui.draggable[0].naturalHeight,
                         ui.draggable.attr("annotation-rotation")
                     ),
-                    ui.draggable.attr("annotation-editable")
+                    ui.draggable.attr("annotation-editable"),
+                    _progressiveCounter + 1
                 );
             },
             out: function (event, ui) {
@@ -544,7 +577,13 @@ import "./dragDropAnnotate.scss";
             };
         };
 
-        /** Transform the original coordinate to resized coordinate **/
+        /**
+         * Transform the original coordinate to resized coordinate
+         * @param {number} x
+         * @param {number} y
+         * @returns {{x: number, y: number}}
+         * @private
+         */
         const _fromOriginalCoord = function (x, y) {
             return {
                 x: parseInt((x * _canvas.width()) / _canvas[0].width),
@@ -575,11 +614,12 @@ import "./dragDropAnnotate.scss";
         /**
          * Draw an annotation
          * @param {Annotation} annotation
-         * @param {boolean} highlight
+         * @param {boolean} highlight to highlight the annotation
          * @private
          */
         const _drawAnnotation = function (annotation, highlight = false) {
-            const x = -annotation.geometry.width / 2, y = -annotation.geometry.height / 2;
+            const width = +annotation.geometry.width, height = +annotation.geometry.height;
+            const x = -width / 2, y = -height / 2;
 
             _ctx.save();
             _ctx.beginPath();
@@ -588,7 +628,7 @@ import "./dragDropAnnotate.scss";
             _ctx.rotate(-annotation.geometry.rotation * Math.PI / 180);
 
             if (annotation.image) {
-                _ctx.drawImage(annotation.image, x, y, annotation.geometry.width, annotation.geometry.height);
+                _ctx.drawImage(annotation.image, x, y, width, height);
             }
 
             if (!annotation.image || opts["annotationStyle"]["imageBorder"]) {
@@ -604,25 +644,96 @@ import "./dragDropAnnotate.scss";
                 _ctx.lineJoin = "round";
                 _ctx.lineWidth = 1;
                 _ctx.strokeStyle = '#000000';
-                _ctx.strokeRect(
-                    x + 1 / 2,
-                    y + 1 / 2,
-                    annotation.geometry.width - 1,
-                    annotation.geometry.height - 1
-                );
+                _ctx.strokeRect(x + 1 / 2, y + 1 / 2, width - 1, height - 1);
 
                 _ctx.lineJoin = "miter";
                 _ctx.lineWidth = borderSize;
                 _ctx.strokeStyle = borderColor;
-                _ctx.strokeRect(
-                    x + 1 + borderSize / 2,
-                    y + 1 + borderSize / 2,
-                    annotation.geometry.width - 2 - borderSize,
-                    annotation.geometry.height - 2 - borderSize
-                );
+                _ctx.strokeRect(x + 1 + borderSize / 2, y + 1 + borderSize / 2, width - 2 - borderSize, height - 2 - borderSize);
             }
+
+            if (opts["metadata"]['enabled']) {
+                _drawMetadata(annotation, x, y, width, height);
+            }
+
             _ctx.restore();
         };
+
+        /**
+         * Draw the Metadata
+         * @param {Annotation} annotation
+         * @param {number} x
+         * @param {number} y
+         * @param {number} width
+         * @param {number} height
+         * @private
+         */
+        const _drawMetadata = function (annotation, x, y, width, height) {
+            const metaOpts = opts["metadata"];
+            if (!metaOpts['enabled']) {
+                return;
+            }
+
+            let text;
+            if (typeof metaOpts['value'] === 'function') {
+                text = metaOpts['value'](annotation);
+            } else {
+                switch (metaOpts['value']) {
+                    case MetadataValue.ID:
+                        text = annotation.id?.toString();
+                        break;
+                    case MetadataValue.TEXT:
+                        text = annotation.text;
+                        break;
+                    case MetadataValue.TIMESTAMP:
+                        text = new Date(annotation.created_at)?.toLocaleString();
+                        break;
+                    case MetadataValue.PROGRESSIVE:
+                    default:
+                        text = annotation.progressive;
+                        break;
+                }
+            }
+            if (text === '' || text === undefined) {
+                return;
+            }
+
+            let posY;
+            switch (_metaPositionArray[0]) {
+                case 'top':
+                    posY = y;
+                    break;
+                case 'middle':
+                    posY = y + (height / 2);
+                    break;
+                case 'bottom':
+                default:
+                    posY = y + height;
+                    break;
+            }
+
+            let posX;
+            switch (_metaPositionArray[1]) {
+                case 'left':
+                    posX = x;
+                    break;
+                case 'center':
+                    posX = x + (width / 2);
+                    break;
+                case 'right':
+                default:
+                    posX = x + width;
+                    break;
+            }
+            posY += (parseInt(metaOpts["offsetY"]) ?? 0);
+            posX += (parseInt(metaOpts["offsetX"]) ?? 0);
+
+            _ctx.font = `${metaOpts["fontSize"]} ${metaOpts["fontFamily"]}`;
+            _ctx.fillStyle = metaOpts["color"];
+            _ctx.textAlign = "center";
+
+            _ctx.fillText(text, posX, posY);
+        }
 
         /**
          * Returns the annotations that have the coordinate inside
@@ -669,7 +780,9 @@ import "./dragDropAnnotate.scss";
             _annotations.forEach(annotation => {
                 const isEqual = (!annotationToHighlight) ? false : ((annotationToHighlight instanceof Object) ? (annotation === annotationToHighlight) : annotation.id === annotationToHighlight);
                 if (isEqual && opts["annotationStyle"]["foreground"]) {
-                    if (foregroundAnno) _drawAnnotation(foregroundAnno, true);
+                    if (foregroundAnno) {
+                        _drawAnnotation(foregroundAnno, true);
+                    }
                     foregroundAnno = annotation;
                     return;
                 }
@@ -687,6 +800,9 @@ import "./dragDropAnnotate.scss";
 
         /** Add a new annotation  **/
         this.addAnnotation = function (annotation, annotationReplaced = undefined, fireEvent = true) {
+            _progressiveCounter++;
+            annotation.progressive = _progressiveCounter;
+
             if (annotationReplaced) {
                 const index = _annotations.indexOf(annotationReplaced);
                 if (index > -1) {
@@ -706,10 +822,14 @@ import "./dragDropAnnotate.scss";
                     break;
                 }
             }
-            if (isLast) _annotations.push(annotation);
+            if (isLast) {
+                _annotations.push(annotation);
+            }
 
             _drawAnnotation(annotation);
-            if (fireEvent) fireEventFn(Events.ANNOTATION_CREATED, [annotation.print()]);
+            if (fireEvent) {
+                fireEventFn(Events.ANNOTATION_CREATED, [annotation.print()]);
+            }
         };
 
         /**
@@ -875,8 +995,9 @@ import "./dragDropAnnotate.scss";
             ) $.error('Invalid annotation.');
 
             if (annotationPrinted["image"]) {
-                if (annotationPrinted["image"] instanceof Image) _addAnnotation(annotationPrinted, annotationPrinted["image"], annotationReplaced);
-                else {
+                if (annotationPrinted["image"] instanceof Image) {
+                    _addAnnotation(annotationPrinted, annotationPrinted["image"], annotationReplaced);
+                } else {
                     if (!annotationPrinted["image"] instanceof String || !annotationPrinted["image"].includes("http")) {
                         $.error('Image must be a URL or an instance of Image.');
                     }
@@ -1022,6 +1143,16 @@ import "./dragDropAnnotate.scss";
             "hiBorderSize": 2.2,  //border width for highlighted annotation  [1-12]    
             "imageBorder": true, //if false, not show the border on image annotation 
             "foreground": true //if false, not brings the annotation to the foreground when the mouseover
+        },
+        "metadata": { //metadata settings
+            "enabled": false, //if true, show the metadata
+            "value": MetadataValue.PROGRESSIVE, //the metadata to show [MetadataValue | (annotation) => string]
+            "fontSize": "40px", //the font size of text
+            "fontFamily": "sans-serif", //the font family of text
+            "color": "#ff0000", //the color of text
+            "position": "bottom-right", //the position of text ["y-x"] -> y: ["top"|"middle"|"bottom"], x: ["left"|"center"|"right"]
+            "offsetX": -20, //the offset from x
+            "offsetY": -10 //the offset from y
         }
     };
 

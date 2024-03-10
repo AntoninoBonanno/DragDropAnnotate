@@ -1,3 +1,7 @@
+<p align="center">
+    <a href="https://github.com/AntoninoBonanno/DragDropAnnotate/releases"><img src="https://img.shields.io/github/v/release/AntoninoBonanno/DragDropAnnotate?label=Latest%20release" alt="Latest release"></a>
+</p>
+
 jQuery plugin to annotate images easily with drag and drop.
 
 **DragDropAnnotate** is a lightweight image annotation tool that make it easy to add custom markers, comments, hotspots to images via drag and drop.

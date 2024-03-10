@@ -1,3 +1,5 @@
+import "./dragDropAnnotate.css";
+
 "use strict";
 
 /**

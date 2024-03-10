@@ -9,12 +9,23 @@
   },
   "main": "/src/dragDropAnnotate.js",
   "scripts": {
-    "prepare": "is-ci || husky"
+    "prepare": "is-ci || husky",
+    "start": "npx webpack serve --mode development --open",
+    "build": "webpack --mode production"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.0.3",
     "@commitlint/config-conventional": "^19.0.3",
+    "css-loader": "^6.10.0",
+    "css-minimizer-webpack-plugin": "^6.0.0",
     "husky": "^9.0.11",
-    "is-ci": "^3.0.1"
+    "is-ci": "^3.0.1",
+    "mini-css-extract-plugin": "^2.8.1",
+    "terser": "^5.28.1",
+    "terser-webpack-plugin": "^5.3.10",
+    "uglify-js": "^3.17.4",
+    "webpack": "^5.90.3",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.0.2"
   }
 }

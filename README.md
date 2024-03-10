@@ -2,6 +2,7 @@
 
 <p align="center">
     <a href="https://github.com/AntoninoBonanno/DragDropAnnotate/releases"><img src="https://img.shields.io/github/v/release/AntoninoBonanno/DragDropAnnotate?label=Latest%20release" alt="Latest release"></a>
+<a href="https://github.com/semantic-release/semantic-release"><img src="https://img.shields.io/badge/semantic--release-conventional-e10079?logo=semantic-release" alt="semantic-release: conventional" /></a>
 </p>
 
 jQuery plugin to annotate images easily with drag and drop.

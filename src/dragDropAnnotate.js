@@ -62,15 +62,26 @@ import "./dragDropAnnotate.scss";
         const touch = event.changedTouches[0];
         isTouch = true;
 
-        const simulatedEvent = document.createEvent("MouseEvent");
-        simulatedEvent.initMouseEvent({
-                touchstart: "mousedown",
-                touchmove: "mousemove",
-                touchend: "mouseup"
-            }[event.type], true, true, window, 1,
-            touch.screenX, touch.screenY,
-            touch.clientX, touch.clientY, false,
-            false, false, false, 0, null);
+        const simulatedEvent = new MouseEvent({
+            touchstart: "mousedown",
+            touchmove: "mousemove",
+            touchend: "mouseup"
+        }[event.type], {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+            detail: 1,
+            screenX: touch.screenX,
+            screenY: touch.screenY,
+            clientX: touch.clientX,
+            clientY: touch.clientY,
+            ctrlKey: false,
+            altKey: false,
+            shiftKey: false,
+            metaKey: false,
+            button: 0,
+            relatedTarget: null
+        });
 
         touch.target.dispatchEvent(simulatedEvent);
 
